@@ -3,7 +3,7 @@
 // const { App } = require("@slack/bolt");
 import { App } from "npm:@slack/bolt";
 
-// import "jsr:@std/dotenv/load";
+import "jsr:@std/dotenv/load";
 
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
@@ -11,7 +11,7 @@ const app = new App({
     socketMode: true
 });
 
-app.command("/hendra", async({ command, ack, respond }) => {
+app.command("/hendra-ping", async({ command, ack, respond }) => {
     const start = Date.now();
     await ack();
     const latency = Date.now() - start;

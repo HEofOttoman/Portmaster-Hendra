@@ -6,15 +6,18 @@ import { App } from "@slack/bolt";
 
 // import "jsr:@std/dotenv/load";
 import "@std/dotenv/load";
+import { channel } from "node:diagnostics_channel";
 // import { ClientRequest } from "node:http";
 
 // import PROMPT from "pr
-type TriggerType = "ping"; // gorkie
+type TriggerType = "ping"; // from gorkie
 
 interface Trigger {
   type: TriggerType;
   info: string | string[];
 }
+
+const ownerID = process.env.OWNER_UUID || ``;
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -62,6 +65,9 @@ app.event("member_joined_channel", async ({ event, say, client, logger }) => {
     logger.error("Error handling event:", error);
     console.log(error);
   }
+
+  await dmOwner(ownerID, `User <@${event.user}> has joined your channel! :D`)
+
 });
 
 app.event("member_left_channel", async ({ event, say, client, logger }) => {
@@ -70,11 +76,38 @@ app.event("member_left_channel", async ({ event, say, client, logger }) => {
       channel: event.channel,
       text: `bye...`,
     });
+
+    await dmOwner(ownerID, `User <@${event.user}> has left your channel :<`)
+
   } catch (error) {
     logger.error("Error handling event:", error);
     console.log("Error handling event:", error);
   }
 });
+
+// Sends a DM to specified user. 
+async function dmOwner(userID: string, text: string) {
+  try {
+    
+    const result = await app.client.conversations.open({
+      users: userID
+    });
+    
+    const dmID = result.channel?.id;
+
+    if (dmID) {
+      await app.client.chat.postMessage({
+        channel: dmID,
+        text: text
+      })
+    } else {
+      console.log('failed to fetch dm id')
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 // app.event("app_mention", async ({ event, say, client, logger}) => {})
 

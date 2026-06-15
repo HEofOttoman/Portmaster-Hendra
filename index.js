@@ -1,9 +1,9 @@
 // require("dotenv").config();
 
 // const { App } = require("@slack/bolt");
-import { App } from "npm:@slack/bolt";
+import { App } from "@slack/bolt";
 
-import "jsr:@std/dotenv/load";
+import "@std/dotenv/load";
 
 // import PROMPT from "prompt.md";
 
@@ -34,6 +34,15 @@ app.command("/hendra-help", async({ command, ack, respond }) => {
         /hendra - huh
         /hendra-help`
     })
+});
+
+app.event('reaction_added', async ({ event, say, client, logger }) => {
+    try {
+        
+    } catch (error) {
+        logger.error('Error handling event:', error)
+    }
+
 });
 
 (async () => {

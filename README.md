@@ -4,3 +4,5 @@ An assistant & bot for my personal Slack channel, made using the Slack BoltJS SD
 ## Contributors
 - Henry Wauzivuff
 - sonion it's me
+
+Inspired by gork, gorkie & warden

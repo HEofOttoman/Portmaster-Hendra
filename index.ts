@@ -16,11 +16,11 @@ interface Trigger {
   info: string | string[];
 }
 
-const ownerID = process.env.OWNER_UUID || `john_fix_your_env`;
+const ownerID = process.env.OWNER_UUID; // Aka allowedUser
 const botToken = process.env.SLACK_BOT_TOKEN;
 const appToken = process.env.SLACK_APP_TOKEN;
 
-if (!botToken || appToken) {
+if (!botToken || !appToken || !ownerID) { // Missing env safeguard
   throw new Error("Missing environment variables. Check for your bot & app tokens.");
 }
 

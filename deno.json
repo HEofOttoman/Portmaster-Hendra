@@ -1,6 +1,7 @@
 {
   "imports": {
     "@slack/bolt": "npm:@slack/bolt@^4.7.3",
-    "@std/dotenv": "jsr:@std/dotenv@^0.225.7"
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.7",
+    "openmeteo": "npm:openmeteo@^1.2.3"
   }
 }

@@ -12,6 +12,157 @@ const params = {
 const url = "https://api.open-meteo.com/v1/forecast";
 const responses = await fetchWeatherApi(url, params);
 
+// JSON file for slack blockkit
+const weatherupdate_Payload_Template = {
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "It is currenly CURRENT_TIME. Here's how weather's looking elsewhere:"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "carousel",
+			"elements": [
+				{
+					"type": "card",
+					"block_id": "carousel-card-1",
+					// "icon": {
+						// "type": "image",
+						// "image_url": "https://picsum.photos/36/36",
+						// "alt_text": "Icon"
+					// },
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "This is a subtitle",
+						"verbatim": false
+					},
+					// "hero_image": {
+					// 	"type": "image",
+					// 	"image_url": "https://picsum.photos/400/300",
+					// 	"alt_text": "Sample hero image"
+					// },
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					},
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-2",
+					// "icon": {
+					// 	"type": "image",
+					// 	"image_url": "https://picsum.photos/36/36",
+					// 	"alt_text": "Icon"
+					// },
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					// "hero_image": {
+					// 	"type": "image",
+					// 	"image_url": "https://picsum.photos/400/300",
+					// 	"alt_text": "Sample hero image"
+					// },
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					},
+					"actions": [
+						{
+							"type": "button",
+							"text": {
+								"type": "plain_text",
+								"text": "Action Button",
+								"emoji": false
+							},
+							"action_id": "button_action_2"
+						}
+					]
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-3",
+					// "icon": {
+					// 	"type": "image",
+					// 	"image_url": "https://picsum.photos/36/36",
+					// 	"alt_text": "Icon"
+					// },
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					// "hero_image": {
+					// 	"type": "image",
+					// 	"image_url": "https://picsum.photos/400/300",
+					// 	"alt_text": "Sample hero image"
+					// },
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					},
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-4",
+					// "icon": {
+					// 	"type": "image",
+					// 	"image_url": "https://picsum.photos/36/36",
+					// 	"alt_text": "Icon"
+					// },
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					// "hero_image": {
+					// 	"type": "image",
+					// 	"image_url": "https://picsum.photos/400/300",
+					// 	"alt_text": "Sample hero image"
+					// },
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					},
+				}
+			]
+		},
+		{
+			"type": "divider"
+		}
+	]
+}
+
 // Process 4 locations
 for (const response of responses) {
 	// Attributes for timezone and location

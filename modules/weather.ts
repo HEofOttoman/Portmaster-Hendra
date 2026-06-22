@@ -12,14 +12,15 @@ const params = {
 const url = "https://api.open-meteo.com/v1/forecast";
 const responses = await fetchWeatherApi(url, params);
 
+
 // JSON file for slack blockkit
-const weatherupdate_Payload_Template = {
+const weatherupdateTemplate = {
 	"blocks": [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "It is currenly CURRENT_TIME. Here's how weather's looking elsewhere:"
+				"text": "It is currenly ${CURRENT_TIME}. Here's how weather's looking elsewhere:"
 			}
 		},
 		{
@@ -38,7 +39,7 @@ const weatherupdate_Payload_Template = {
 					// },
 					"title": {
 						"type": "mrkdwn",
-						"text": "LOCATION_NAME",
+						"text": "${LOCATION_NAME}",
 						"verbatim": false
 					},
 					"subtitle": {
@@ -53,7 +54,8 @@ const weatherupdate_Payload_Template = {
 					// },
 					"body": {
 						"type": "mrkdwn",
-						"text": "<Insert weather data>",
+						"text": 
+						"Temperature, Precipitation, Rain, Showers, snowfall, snow depth, weather code",
 						"verbatim": false
 					},
 				},
@@ -181,6 +183,7 @@ for (const response of responses) {
 	);
 	
 	const hourly = response.hourly()!;
+	const current = response.current()!;
 	
 	// Note: The order of weather variables in the URL query and the indices below need to match!
 	const weatherData = {
@@ -200,5 +203,10 @@ for (const response of responses) {
 	};
 	
 	// The 'weatherData' object now contains a simple structure, with arrays of datetimes and weather information
-	console.log("\nHourly data:\n", weatherData.hourly)
+	// console.log("\nHourly data:\n", weatherData.hourly)
+}
+
+export async function getCurrentWeather() {
+	await weatherupdateTemplate;
+	
 }

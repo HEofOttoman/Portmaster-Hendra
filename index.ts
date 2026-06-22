@@ -1,15 +1,14 @@
 // require("dotenv").config();
 
-// const { App } = require("@slack/bolt");
-// import { App } from "npm:@slack/bolt";
 import { App } from "@slack/bolt";
 
-// import "jsr:@std/dotenv/load";
 import "@std/dotenv/load";
-import { channel } from "node:diagnostics_channel";
+import process from "node:process"; // <- Added because NodeJS process global is discouraged in Deno
+
+// import { channel } from "node:diagnostics_channel";
 // import { ClientRequest } from "node:http";
 
-// import PROMPT from "pr
+// import PROMPT from "prompt.md"
 type TriggerType = "ping"; // from gorkie
 
 interface Trigger {
@@ -17,11 +16,17 @@ interface Trigger {
   info: string | string[];
 }
 
-const ownerID = process.env.OWNER_UUID || ``;
+const ownerID = process.env.OWNER_UUID || `john_fix_your_env`;
+const botToken = process.env.SLACK_BOT_TOKEN;
+const appToken = process.env.SLACK_APP_TOKEN;
+
+if (!botToken || appToken) {
+  throw new Error("Missing environment variables. Check for your bot & app tokens.");
+}
 
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  appToken: process.env.SLACK_APP_TOKEN,
+  token: botToken,
+  appToken,
   socketMode: true,
 });
 
@@ -36,6 +41,8 @@ app.command("/hendra-ping", async ({ command, ack, respond }) => {
   const latency = Date.now() - start;
   await respond({ text: `ugh fine. Pong!\nLatency: ${latency}ms` });
 });
+
+// put in chat.scheduleMessage somewhere
 
 app.command("/weather-ports", async ({ command, ack, respond }) => {
   await ack();
@@ -53,6 +60,14 @@ app.command("/hendra-help", async ({ command, ack, respond }) => {
         /hendra-help`,
   });
 });
+
+app.event("app_mention", async ({ event, say, client, logger }) => {
+  try {
+    
+  } catch (error) {
+    console.log(error);
+  }
+})
 
 app.event("member_joined_channel", async ({ event, say, client, logger }) => {
   try {

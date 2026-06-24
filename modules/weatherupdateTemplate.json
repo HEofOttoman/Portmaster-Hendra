@@ -1,0 +1,110 @@
+{
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "It is currently ${CURRENT_TIME}. Here's how weather's looking elsewhere:"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "carousel",
+			"elements": [
+				{
+					"type": "card",
+					"block_id": "carousel-card-1",
+					"title": {
+						"type": "mrkdwn",
+						"text": "${LOCATION_NAME}",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "This is a subtitle",
+						"verbatim": false
+					},
+					"body": {
+						"type": "mrkdwn",
+						"text": 
+						"Temperature, Precipitation, Rain, Showers, snowfall, snow depth, weather code",
+						"verbatim": false
+					}
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-2",
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					},
+					"actions": [
+						{
+							"type": "button",
+							"text": {
+								"type": "plain_text",
+								"text": "Action Button",
+								"emoji": false
+							},
+							"action_id": "button_action_2"
+						}
+					]
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-3",
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					}
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-4",
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					}
+				}
+			]
+		},
+		{
+			"type": "divider"
+		}
+	]
+}

@@ -8,7 +8,7 @@ import process from "node:process"; // <- Added because NodeJS process global is
 // import { channel } from "node:diagnostics_channel";
 // import { ClientRequest } from "node:http";
 
-// import weather from "modules/weather.ts"; // or something
+// import { getCurrentWeather } from "modules/weather.ts"; // or something
 // import PROMPT from "prompt.md"
 type TriggerType = "ping"; // from gorkie
 

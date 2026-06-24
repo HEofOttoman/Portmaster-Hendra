@@ -50,7 +50,8 @@ for (const response of responses) {
 	// Note: The order of weather variables in the URL query and the indices below need to match!
 	const weatherData = {
 		current: {
-			time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000 ),
+			// time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000 ), // utcOffsetSeconds pushes things in the future because current.time() is already present
+			time: new Date((Number(current.time())) * 1000 ),
 			temperature_2m: current.variables(0)!.value(),
 			precipitation: current.variables(1)!.value(),
 			rain: current.variables(2)!.value(),
@@ -98,9 +99,18 @@ for (const response of responses) {
 
 		}
 	};
+
+	// Fix same time duplication bug
+	const localTimeFormatted = weatherData.current.time.toLocaleString("en-AU", {
+		timeZone: `${timezone}`, // e.g., "America/New_York", "Asia/Jakarta"
+		dateStyle: "full",
+		timeStyle: "medium"
+	});
+
 	// The 'weatherData' object now contains a simple structure, with arrays of datetimes and weather information
 	console.log(
-		`\nCurrent time: ${weatherData.current.time}\n`,
+		// `\nCurrent time: ${weatherData.current.time}\n`,
+		`\nCurrent time: ${localTimeFormatted}\n`,
 		`\nCurrent temperature_2m: ${weatherData.current.temperature_2m}`,
 		`\nCurrent precipitation: ${weatherData.current.precipitation}`,
 		`\nCurrent rain: ${weatherData.current.rain}`,

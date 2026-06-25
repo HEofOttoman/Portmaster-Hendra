@@ -1,5 +1,8 @@
 // # Javascript code example from the url builder at https://open-meteo.com/en/docs
 
+// import { time } from "node:console";
+// import { createConnection } from "node:net"; <- what why are these here
+
 import { fetchWeatherApi } from "openmeteo";
 
 // const locationStringNames = ["New York City", "Canberra", "Jakarta", "Nairobi"];
@@ -281,10 +284,90 @@ const weatherupdateTemplate = {
 export async function getCurrentWeather() {
 	// const newdataresponse = await fetchWeatherApi(url, params);
 	
-	for (const response of responses) {
-
-	}
-	
 	await weatherupdateTemplate;
 	
+	try {
+		const data = await fetchWeatherApi(url, params);
+
+		for (const response of data) {			
+			const latitude = response.latitude();
+			const longitude = response.longitude();
+			const elevation = response.elevation();
+			const timezone = response.timezone();
+			const timezoneAbbreviation = response.timezoneAbbreviation();
+			const utcOffsetSeconds = response.utcOffsetSeconds();
+
+			const hourly = response.hourly()!;
+			const current = response.current()!;
+			const daily = response.daily()!;
+
+			// Define Int64 variables so they can be processed accordingly
+			const sunrise = daily.variables(2)!;
+			const sunset = daily.variables(3)!;
+
+			const weatherData = {
+				current: {
+					time: new Date((Number(current.time())) * 1000 ),
+					temperature_2m: current.variables(0)!.value(),
+					precipitation: current.variables(1)!.value(),
+					rain: current.variables(2)!.value(),
+					showers: current.variables(3)!.value(),
+					snowfall: current.variables(4)!.value(),
+					is_day: current.variables(5)!.value(),
+					apparent_temperature: current.variables(6)!.value(),
+					weather_code: current.variables(7)!.value(),
+					cloud_cover: current.variables(8)!.value(),
+
+				},
+				
+				hourly: {
+					time: Array.from(
+						{ length: (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval() },
+						(_, i) => new Date((Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) * 1000)
+					),
+					temperature_2m: hourly.variables(0)!.valuesArray(),
+					showers: hourly.variables(1)!.valuesArray(),
+					snowfall: hourly.variables(2)!.valuesArray(),
+					snow_depth: hourly.variables(3)!.valuesArray(),
+					rain: hourly.variables(4)!.valuesArray(),
+					precipitation: hourly.variables(5)!.valuesArray(),
+					weather_code: hourly.variables(6)!.valuesArray(),
+				},
+				daily: {
+					time: Array.from(
+						{ length: (Number(daily.timeEnd()) - Number(daily.time())) / hourly.interval() },
+						(_, i) => new Date((Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) * 1000)
+					),
+					temperature_2m_max: daily.variables(0)!.valuesArray,
+					temperature_2m_min: daily.variables(1)!.valuesArray,
+
+					// map int64 values
+					sunrise: [...Array(sunrise.valuesInt64Length())].map(
+						(_, i) => new Date((Number(sunrise.valuesInt64(i))))
+					),
+					sunset: [...Array(sunset.valuesInt64Length())].map(
+						(_, i) => new Date((Number(sunset.valuesInt64(i)) + utcOffsetSeconds * 1000))
+					),
+					uv_index_max: daily.variables(4)!.valuesArray(),
+					rain_sum: daily.variables(5)!.valuesArray(),
+					precipitation_probability_max: daily.variables(6)!.valuesArray(),
+					temperature_2m_mean: daily.variables(7)!.valuesArray(),
+					weather_code: daily.variables(8)!.valuesArray(),
+
+				}
+			}
+
+			const localTimeFormatted = weatherData.current.time.toLocaleDateString("en-AU", {
+				timeZone: `${timezone}`,
+				dateStyle: "full",
+				// timeStyle: "medium"
+			})
+
+			return `Current Weather for ${latitude}°N ${longitude}°E in ${timezone} ${timezoneAbbreviation}, at ${localTimeFormatted}. ${elevation} above sea level btw`
+		}
+
+	} catch (error) {
+		console.error("Openmeteo API Error: ", error);
+		return "sorry, I couldn't find any weather data 🥀"
+	}
 }

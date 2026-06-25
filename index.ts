@@ -8,7 +8,7 @@ import process from "node:process"; // <- Added because NodeJS process global is
 // import { channel } from "node:diagnostics_channel";
 // import { ClientRequest } from "node:http";
 
-// import { getCurrentWeather } from "modules/weather.ts"; // or something
+import { getCurrentWeather } from "./modules/weather.ts"; // oh i forgor the ./
 // import PROMPT from "prompt.md"
 type TriggerType = "ping"; // from gorkie
 
@@ -47,8 +47,11 @@ app.command("/hendra-ping", async ({ command, ack, respond }) => {
 
 app.command("/weather-ports", async ({ command, ack, respond }) => {
   await ack();
+
+  const msg = await getCurrentWeather();
+
   await respond({
-    text: "",
+    text: msg,
   });
 });
 

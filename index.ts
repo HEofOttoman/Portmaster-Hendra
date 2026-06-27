@@ -33,7 +33,7 @@ const app = new App({
 
 app.command("/hendra", async ({ command, ack, respond }) => {
   await ack();
-  await respond({ text: `yes what whar huh what?` });
+  await respond({ text: `yes what whar huh what? im up boss` });
 });
 
 app.command("/hendra-ping", async ({ command, ack, respond }) => {
@@ -61,13 +61,15 @@ app.command("/hendra-help", async ({ command, ack, respond }) => {
     text: `Commands:
         /hendra-ping - speed
         /hendra - huh
-        /hendra-help`,
+        /hendra-help
+        /weather-ports`,
   });
 });
 
 app.event("app_mention", async ({ event, say, client, logger }) => {
   try {
-    
+    console.log(event.user);
+
   } catch (error) {
     console.log(error);
   }

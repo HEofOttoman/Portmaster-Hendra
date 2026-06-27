@@ -11,5 +11,6 @@ SDK. I use Deno because why not.
 
 - Henry Wauzivuff
 - sonion it's me
+- Ai used for answering why the timestamps didn't line up
 
 Inspired by gork, gorkie & warden

@@ -289,6 +289,7 @@ export async function getCurrentWeather() {
 	try {
 		const data = await fetchWeatherApi(url, params);
 
+		let messages = [];
 		for (const response of data) {			
 			const latitude = response.latitude();
 			const longitude = response.longitude();
@@ -363,8 +364,14 @@ export async function getCurrentWeather() {
 				// timeStyle: "medium"
 			})
 
-			return `Current Weather for ${latitude}°N ${longitude}°E in ${timezone} ${timezoneAbbreviation}, at ${localTimeFormatted}. ${elevation} above sea level btw`
+			messages.push(
+				`Current Weather for ${latitude}°N ${longitude}°E in ${timezone} ${timezoneAbbreviation}, at ${localTimeFormatted}. ${elevation} above sea level btw \n
+				`
+			)
 		}
+		const payload = messages.join(''); // make array into one string with newlines and nothing else
+		console.log(payload);
+		return payload;
 
 	} catch (error) {
 		console.error("Openmeteo API Error: ", error);

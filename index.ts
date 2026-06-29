@@ -9,6 +9,7 @@ import process from "node:process"; // <- Added because NodeJS process global is
 // import { ClientRequest } from "node:http";
 
 import { getCurrentWeather } from "./modules/weather.ts"; // oh i forgor the ./
+import { channel } from "node:diagnostics_channel";
 // import PROMPT from "prompt.md"
 type TriggerType = "ping"; // from gorkie
 
@@ -122,9 +123,30 @@ async function dmOwner(userID: string, text: string) {
         text: text
       })
     } else {
-      console.log('failed to fetch dm id')
+      console.log('failed to fetch dm id');
     }
 
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const kv = Deno.openKv();
+
+async function scheduleReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {
+  try {
+    await app.client.chat.postMessage({
+      channel: channelID,
+      text: `aye aye capt'n, scheduled reminder "${reminderText}" at ${scheduledTime}`,
+    })
+
+    Deno.cron(reminderName, scheduledTime, () => {
+      app.client.chat.postMessage({
+      channel: channelID,
+      text: reminderText,
+      })
+    });
+    
   } catch (error) {
     console.log(error);
   }

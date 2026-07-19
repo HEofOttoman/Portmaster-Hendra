@@ -133,14 +133,14 @@ async function dmOwner(userID: string, text: string) {
 
 const kv = Deno.openKv();
 
-async function scheduleReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {
+async function sendReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {
   try {
-    await app.client.chat.postMessage({
-      channel: channelID,
-      text: `aye aye capt'n, scheduled reminder "${reminderText}" at ${scheduledTime}`,
-    })
+    // await app.client.chat.postMessage({
+    //   channel: channelID,
+    //   text: `aye aye capt'n, scheduled reminder "${reminderText}" at ${scheduledTime}`,
+    // })
 
-    Deno.cron(reminderName, scheduledTime, () => {
+    await Deno.cron(reminderName, scheduledTime, () => {
       app.client.chat.postMessage({
       channel: channelID,
       text: reminderText,
@@ -151,6 +151,9 @@ async function scheduleReminder(channelID: string, reminderName: string, reminde
     console.log(error);
   }
 }
+
+// Hardcoded daily things?
+sendReminder(`C0AMVTVLH4Y`, 'daily sendReminder', "hi!", '* * * *' );
 
 // app.event("app_mention", async ({ event, say, client, logger}) => {})
 

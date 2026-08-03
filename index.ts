@@ -1,6 +1,6 @@
 // require("dotenv").config();
 
-import { App } from "@slack/bolt";
+import { App, onlyViewActions } from "@slack/bolt";
 
 import "@std/dotenv/load";
 import process from "node:process"; // <- Added because NodeJS process global is discouraged in Deno
@@ -9,6 +9,8 @@ import process from "node:process"; // <- Added because NodeJS process global is
 // import { ClientRequest } from "node:http";
 
 import { getCurrentWeather } from "./modules/weather.ts"; // oh i forgor the ./
+import { json } from "node:stream/consumers";
+import { ClientRequest } from "node:http";
 // import PROMPT from "prompt.md"
 type TriggerType = "ping"; // from gorkie
 
@@ -30,6 +32,30 @@ const app = new App({
   token: botToken,
   appToken,
   socketMode: true,
+});
+
+app.event("app_home_opened", async ({ event, client, logger }) => {
+  try {
+    // await homeview;
+    
+    await client.views.publish({
+      user_id: event.user,
+      view: {
+        type: "home",
+        blocks: [
+          {
+            type: "header",
+            text: { type: "plain_text", text: "This is app home."}
+          }
+        ],
+        
+      }
+    });
+
+  } catch (error) {
+    console.log(error);
+    logger.error(error);
+  }
 });
 
 app.command("/hendra", async ({ command, ack, respond }) => {

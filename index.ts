@@ -9,7 +9,6 @@ import process from "node:process"; // <- Added because NodeJS process global is
 // import { ClientRequest } from "node:http";
 
 import { getCurrentWeather } from "./modules/weather.ts"; // oh i forgor the ./
-import { channel } from "node:diagnostics_channel";
 // import PROMPT from "prompt.md"
 type TriggerType = "ping"; // from gorkie
 
@@ -21,6 +20,7 @@ interface Trigger {
 const ownerID = process.env.OWNER_UUID; // Aka allowedUser
 const botToken = process.env.SLACK_BOT_TOKEN;
 const appToken = process.env.SLACK_APP_TOKEN;
+const ownedChannels = ["C0AMVTVLH4Y","C0BB6HQDUBE"];
 
 if (!botToken || !appToken || !ownerID) { // Missing env safeguard
   throw new Error("Missing environment variables. Check for your bot & app tokens.");
@@ -53,6 +53,7 @@ app.command("/weather-ports", async ({ command, ack, respond }) => {
 
   await respond({
     text: msg,
+    // blocks: [],
   });
 });
 
@@ -67,6 +68,21 @@ app.command("/hendra-help", async ({ command, ack, respond }) => {
   });
 });
 
+app.command("/hendra-channel", async ({ ack, command, respond }) => {
+  await ack();
+  if (
+    command.user_id !== ownerID //||
+    // !allowedChannels.includes(command.channel_id)
+  ) {
+    await respond("You don't have permission to run that.");
+    return;
+  }
+  await respond({
+    response_type: "in_channel",
+    text: `<!channel> ${command.text}`,
+  });
+});
+
 app.event("app_mention", async ({ event, say, client, logger }) => {
   try {
     console.log(event.user);
@@ -78,6 +94,11 @@ app.event("app_mention", async ({ event, say, client, logger }) => {
 
 app.event("member_joined_channel", async ({ event, say, client, logger }) => {
   try {
+    if (!ownedChannels.includes(event.channel)) {
+      // await say("just what do you think you're doing?");
+      return;
+    } 
+    
     await client.chat.postMessage({
       channel: event.channel,
       text:
@@ -131,7 +152,7 @@ async function dmOwner(userID: string, text: string) {
   }
 }
 
-const kv = Deno.openKv();
+// const kv = Deno.openKv();
 
 async function sendReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {
   try {
@@ -140,12 +161,17 @@ async function sendReminder(channelID: string, reminderName: string, reminderTex
     //   text: `aye aye capt'n, scheduled reminder "${reminderText}" at ${scheduledTime}`,
     // })
 
-    await Deno.cron(reminderName, scheduledTime, () => {
-      app.client.chat.postMessage({
+    await app.client.chat.postMessage({
       channel: channelID,
       text: reminderText,
-      })
-    });
+    })
+
+    // await Deno.cron(reminderName, scheduledTime, () => {
+    //   app.client.chat.postMessage({
+    //   channel: channelID,
+    //   text: reminderText,
+    //   })
+    // });
     
   } catch (error) {
     console.log(error);
@@ -153,7 +179,7 @@ async function sendReminder(channelID: string, reminderName: string, reminderTex
 }
 
 // Hardcoded daily things?
-sendReminder(`C0AMVTVLH4Y`, 'daily sendReminder', "hi!", '* * * *' );
+// sendReminder(`C0AMVTVLH4Y`, 'daily sendReminder', "hi!", '* * * *' );
 
 // app.event("app_mention", async ({ event, say, client, logger}) => {})
 

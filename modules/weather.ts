@@ -1,8 +1,5 @@
 // # Javascript code example from the url builder at https://open-meteo.com/en/docs
 
-// import { time } from "node:console";
-// import { createConnection } from "node:net"; <- what why are these here
-
 import { fetchWeatherApi } from "openmeteo";
 
 // const locationStringNames = ["New York City", "Canberra", "Jakarta", "Nairobi"];

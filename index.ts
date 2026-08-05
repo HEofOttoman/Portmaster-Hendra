@@ -46,6 +46,7 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
           {
             type: "header",
             text: { type: "plain_text", text: "This is app home."}
+            
           }
         ],
         
@@ -57,6 +58,16 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
     logger.error(error);
   }
 });
+
+app.command("/sailsouth", async ({ command, ack, respond, client }) => {
+  await ack();
+  
+  await client.conversations.invite({
+    users: command.user_id,
+    channel: `C0AMVTVLH4Y`,
+  });
+
+})
 
 app.command("/hendra", async ({ command, ack, respond }) => {
   await ack();
@@ -121,15 +132,15 @@ app.event("app_mention", async ({ event, say, client, logger }) => {
 app.event("member_joined_channel", async ({ event, say, client, logger }) => {
   try {
     if (!ownedChannels.includes(event.channel)) {
-      // await say("just what do you think you're doing?");
       return;
-    } 
+    }
     
-    await client.chat.postMessage({
-      channel: event.channel,
-      text:
-        `<@${event.user}> :wavey: Welcome to Henry's channel! <@${`U080F22CTJN`}>, greet your guest. Behave, or I might have to █████ ███ ██████ :>.`,
-    });
+    // await client.chat.postMessage({
+    //   channel: event.channel,
+    //   text:
+    //     `<@${event.user}> :wavey: Welcome to Henry's channel! <@${`U080F22CTJN`}>, greet your guest. Behave, or I might have to █████ ███ ██████ :>.`,
+    // });
+    // Not needed as long as private channels show you joined
   } catch (error) {
     logger.error("Error handling event:", error);
     console.log(error);

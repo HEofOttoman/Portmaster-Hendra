@@ -5,12 +5,7 @@ import { App, onlyViewActions } from "@slack/bolt";
 import "@std/dotenv/load";
 import process from "node:process"; // <- Added because NodeJS process global is discouraged in Deno
 
-// import { channel } from "node:diagnostics_channel";
-// import { ClientRequest } from "node:http";
-
 import { getCurrentWeather } from "./modules/weather.ts"; // oh i forgor the ./
-import { json } from "node:stream/consumers";
-import { ClientRequest } from "node:http";
 // import PROMPT from "prompt.md"
 type TriggerType = "ping"; // from gorkie
 
@@ -34,23 +29,110 @@ const app = new App({
   socketMode: true,
 });
 
+// import app_home from "./modules/app_home.json" with { type: "json" };
 app.event("app_home_opened", async ({ event, client, logger }) => {
   try {
     // await homeview;
     
     await client.views.publish({
       user_id: event.user,
-      view: {
-        type: "home",
-        blocks: [
-          {
-            type: "header",
-            text: { type: "plain_text", text: "This is app home."}
+      view:  //{ // inject app_home.json here
+        // type: "home",
+        // blocks: [
+        //   {
+        //     type: "header",
+        //     text: { type: "plain_text", text: "This is app home."}
             
+        //   }
+        // ],
+      //}
+      {
+      "type": "home",
+      "blocks": [
+        {
+          "type": "header",
+          "text": {
+            "type": "plain_text",
+            "text": "Hendra",
+            "emoji": true
+          },
+          // "level": 1
+        },
+        {
+          "type": "image",
+          "title": {
+            "type": "plain_text",
+            "text": "niniii",
+            "emoji": true
+          },
+          "image_url": "https://user-cdn.hackclub-assets.com/019fd13c-0b7c-7fc5-8e3f-ceb8f7c7d1ab/slack_n_hendra.png",
+          "alt_text": "look at this beautiful guy 🥹"
+        },
+        {
+          "type": "header",
+          "text": {
+            "type": "plain_text",
+            "text": "Weather of the Ports",
+            "emoji": true
+          },
+          // "level": 2
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "carousel",
+          "elements": [
+            {
+              "type": "card",
+              "block_id": "carousel-card-4",
+              "icon": {
+                "type": "image",
+                "image_url": "https://picsum.photos/36/36",
+                "alt_text": "Icon"
+              },
+              "title": {
+                "type": "mrkdwn",
+                "text": "New York",
+                "verbatim": false
+              },
+              "subtitle": {
+                "type": "mrkdwn",
+                "text": "`${CurrentTime}`",
+                "verbatim": false
+              },
+              "body": {
+                "type": "mrkdwn",
+                "text": "Current Temperature: ${currentTemp} \n Precipation: ${precipitation} \n ☀️/🌃",
+                "verbatim": false
+              }
+            }
+          ]
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Embark?"
+          },
+          "accessory": {
+            "type": "button",
+            "style": "primary",
+            "text": {
+              "type": "plain_text",
+              "text": "Sail.",
+              "emoji": true
+            },
+            "value": "join_btn",
+            "action_id": "button-action"
           }
-        ],
-        
-      }
+        }
+      ]
+    }
+
     });
 
   } catch (error) {

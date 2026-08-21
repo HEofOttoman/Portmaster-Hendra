@@ -5,7 +5,8 @@ SDK. I use Deno because why not.
 
 ## Features
 - Fetches weather for hmm important 'port' locations yes
-- Reminders?
+- ~~Reminders?~~
+- Daily counters
 
 ## Contributors
 

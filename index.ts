@@ -214,7 +214,7 @@ app.event("app_mention", async ({ event, say, client, logger }) => {
 app.event("member_joined_channel", async ({ event, say, client, logger }) => {
   try {
     if (!ownedChannels.includes(event.channel)) {
-      return;
+      return; // Ignore any other channel
     }
     
     await client.usergroups.users.update({ // Add to client
@@ -231,7 +231,7 @@ app.event("member_joined_channel", async ({ event, say, client, logger }) => {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "exeunt!"
+            "text": "_exeunt!_"
           },
           "accessory": {
             "type": "button",
@@ -313,7 +313,36 @@ async function dmOwner(userID: string, text: string) {
   }
 }
 
+
+Deno.cron("Update 365 days count", `0 0 * * *`, () => { // * * * * * would be every minute. Put that in for tests. It's also in UTC btw
+  try {
+    updateDayCount();
+  } catch (error) {
+    console.log(error);
+  }
+});
 // const kv = Deno.openKv();
+
+async function updateDayCount() {
+  let dayCount = 224;
+  
+  const daysInfo = await app.client.conversations.info({channel: `C0A63BZ2AQN`});
+  const currentTopic = daysInfo?.["channel"]?.["topic"]?.["value"];
+
+  const newTopic = currentTopic?.replace( /insertregexaqui/, currentTopic);
+
+  await app.client.conversations.setTopic({
+    // twas 224
+    topic: `Day ${dayCount}/365 - THE HALFWAY MARK HAS BEEN ATTAINED || 2026 is yours for the making… wanna join in? check the pins!`,
+    channel: `C0A63BZ2AQN` // Update 365 days
+  })
+
+  await app.client.conversations.setTopic({
+    topic: `${dayCount}/365`,
+    channel: `C0AMVTVLH4Y` // Update PC
+  })
+
+}
 
 async function sendReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {
   try {

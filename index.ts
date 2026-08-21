@@ -217,6 +217,48 @@ app.event("member_joined_channel", async ({ event, say, client, logger }) => {
       return;
     }
     
+    await client.usergroups.users.update({ // Add to client
+      usergroup: `S0ANEQMV7UJ`,
+      users: event.user
+    });
+
+    await client.chat.postEphemeral({
+      user: event.user,
+      channel: event.channel,
+      text: `<@${event.user}, welcome to henry's place. I've added you to his ping group, click here to leave.`,
+      blocks: [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "exeunt!"
+          },
+          "accessory": {
+            "type": "button",
+            "style": "primary",
+            "text": {
+              "type": "plain_text",
+              "text": ":exit:",
+              "emoji": true
+            },
+            "value": "leave_btn",
+            "action_id": "button-action"
+          }
+        }
+      ]
+    })
+    /* "accessory": {
+            "type": "button",
+            "style": "primary",
+            "text": {
+              "type": "plain_text",
+              "text": "Sail.",
+              "emoji": true
+            },
+            "value": "join_btn",
+            "action_id": "button-action"
+          }*/
+
     // await client.chat.postMessage({
     //   channel: event.channel,
     //   text:

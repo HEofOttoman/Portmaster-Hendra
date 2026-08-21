@@ -278,6 +278,11 @@ const weatherupdateTemplate = {
 	]
 }
 
+export async function fetchData() {
+	// okay cleaning up this architecture
+	// This should like get purely the current weather, returning values, which would be parsed by another function?
+}
+
 export async function getCurrentWeather() {
 	// const newdataresponse = await fetchWeatherApi(url, params);
 	

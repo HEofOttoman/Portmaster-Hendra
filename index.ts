@@ -274,12 +274,12 @@ app.event("member_joined_channel", async ({ event, say, client, logger }) => {
 
 });
 
-app.event("member_left_channel", async ({ event, say, client, logger }) => {
+app.event("member_left_channel", async ({ event, /*say,*/ client, logger }) => {
   try {
-    await client.chat.postMessage({
-      channel: event.channel,
-      text: `bye...`,
-    });
+    // await client.chat.postMessage({
+    //   channel: event.channel,
+    //   text: `bye...`,
+    // });
 
     await dmOwner(ownerID, `User <@${event.user}> has left your channel :<`)
 
@@ -313,38 +313,61 @@ async function dmOwner(userID: string, text: string) {
   }
 }
 
-
-Deno.cron("Update 365 days count", `0 0 * * *`, () => { // * * * * * would be every minute. Put that in for tests. It's also in UTC btw
+// 0 0 * * *
+Deno.cron("Update 365 days count", `* * * * *`, () => { // * * * * * would be every minute. Put that in for tests. It's also in UTC btw
   try {
-    updateDayCount();
+    updateDayCount(`C0BNS59V22`); // Public test channel
+    // updateDayCount(`C0A63BZ2AQN`);
   } catch (error) {
     console.log(error);
   }
 });
 // const kv = Deno.openKv();
 
-async function updateDayCount() {
-  let dayCount = 224;
+const dailyCounterRegex = /Day\s+(\d+)\/365/i; // This regex looks for a pattern of `Day x/365`, ignoring the following. 
+// Dynamically access a day count from a channel topic using regex
+async function updateDayCount(channel_id: string) {
   
-  const daysInfo = await app.client.conversations.info({channel: `C0A63BZ2AQN`});
+  // const daysInfo = await app.client.conversations.info({channel: `C0A63BZ2AQN`});
+  const daysInfo = await app.client.conversations.info({channel: channel_id});
   const currentTopic = daysInfo?.["channel"]?.["topic"]?.["value"];
+  const regexMatch = currentTopic?.match(dailyCounterRegex);
 
-  const newTopic = currentTopic?.replace( /insertregexaqui/, currentTopic);
+  let dayCount; 
+  if (!regexMatch) { // guard against is possibly 'null' or 'undefined'.
+    console.log("No match found");
+    // return;
+  } else {
+    dayCount = 1 + regexMatch[1];
+  }
+  // let dayCount = 224;
+
+  // const newTopic = currentTopic?.replace( /insertregexaqui/, currentTopic);
+  const newTopic = currentTopic?.replace( dailyCounterRegex, currentTopic);
 
   await app.client.conversations.setTopic({
     // twas 224
-    topic: `Day ${dayCount}/365 - THE HALFWAY MARK HAS BEEN ATTAINED || 2026 is yours for the making… wanna join in? check the pins!`,
+    // topic: `Day ${dayCount}/365 - THE HALFWAY MARK HAS BEEN ATTAINED || 2026 is yours for the making… wanna join in? check the pins!`,
+    topic: newTopic ?? `${currentTopic}`, // Nullish coalescing apparently thx goog
+    channel: channel_id // Update 365 days
+  })
+
+  /*
+  await app.client.conversations.setTopic({
+    // twas 224
+    // topic: `Day ${dayCount}/365 - THE HALFWAY MARK HAS BEEN ATTAINED || 2026 is yours for the making… wanna join in? check the pins!`,
+    topic: newTopic ?? `${currentTopic}`, // Nullish coalescing apparently thx goog
     channel: `C0A63BZ2AQN` // Update 365 days
   })
 
   await app.client.conversations.setTopic({
     topic: `${dayCount}/365`,
     channel: `C0AMVTVLH4Y` // Update PC
-  })
-
+  }) */
+  console.log(`Channel day count ${channel_id} successfully updated!`)
 }
 
-async function sendReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {
+/* async function sendReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {
   try {
     // await app.client.chat.postMessage({
     //   channel: channelID,
@@ -367,6 +390,7 @@ async function sendReminder(channelID: string, reminderName: string, reminderTex
     console.log(error);
   }
 }
+*/
 
 // Hardcoded daily things?
 // sendReminder(`C0AMVTVLH4Y`, 'daily sendReminder', "hi!", '* * * *' );

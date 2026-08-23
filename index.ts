@@ -317,7 +317,8 @@ async function dmOwner(userID: string, text: string) {
 Deno.cron("Update 365 days count", `* * * * *`, () => { // * * * * * would be every minute. Put that in for tests. It's also in UTC btw
   try {
     updateDayCount(`C0BNS59V22V`); // Public test channel
-    // updateDayCount(`C0A63BZ2AQN`);
+    // updateDayCount(`C0A63BZ2AQN`); // 365 days channel
+    // updateDayCount(`C0AMVTVLH4Y`); // Personal channel
   } catch (error) {
     console.log(error);
   }
@@ -328,7 +329,6 @@ const dailyCounterRegex = /Day\s+(\d+)\/365/i; // This regex looks for a pattern
 // Dynamically access a day count from a channel topic using regex
 async function updateDayCount(channel_id: string) {
   
-  // const daysInfo = await app.client.conversations.info({channel: `C0A63BZ2AQN`});
   const daysInfo = await app.client.conversations.info({channel: channel_id});
   const currentTopic = daysInfo?.["channel"]?.["topic"]?.["value"];
   const regexMatch = currentTopic?.match(dailyCounterRegex);
@@ -340,32 +340,19 @@ async function updateDayCount(channel_id: string) {
   } else {
     dayCount = parseInt(regexMatch[1]);
   }
-  // let dayCount = 224;
   const nextDay = 1 + dayCount;
 
   // const newTopic = currentTopic?.replace( /insertregexaqui/, currentTopic);
   const newTopic = currentTopic?.replace( dailyCounterRegex, `Day ${nextDay}/365`);
 
+  const currentName = daysInfo?.["channel"]?.["name"];
   await app.client.conversations.setTopic({
     // twas 224
-    // topic: `Day ${dayCount}/365 - THE HALFWAY MARK HAS BEEN ATTAINED || 2026 is yours for the making… wanna join in? check the pins!`,
     topic: newTopic ?? `${currentTopic}`, // Nullish coalescing apparently thx goog
     channel: channel_id // Update 365 days
   })
 
-  /*
-  await app.client.conversations.setTopic({
-    // twas 224
-    // topic: `Day ${dayCount}/365 - THE HALFWAY MARK HAS BEEN ATTAINED || 2026 is yours for the making… wanna join in? check the pins!`,
-    topic: newTopic ?? `${currentTopic}`, // Nullish coalescing apparently thx goog
-    channel: `C0A63BZ2AQN` // Update 365 days
-  })
-
-  await app.client.conversations.setTopic({
-    topic: `${dayCount}/365`,
-    channel: `C0AMVTVLH4Y` // Update PC
-  }) */
-  console.log(`Channel day count ${channel_id} successfully updated!`)
+  console.log(`Channel day count for #${currentName} (${channel_id}) successfully updated! Day ${nextDay}/365`)
 }
 
 /* async function sendReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {

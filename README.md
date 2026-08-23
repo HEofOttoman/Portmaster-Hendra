@@ -4,11 +4,15 @@
 An assistant & bot for my personal Slack channel, made using the Slack BoltJS
 SDK. I use Deno because why not.
 
+> [!Warning] 
+> This project uses Deno.cron(), which has the warning:
+> *Warning: This is an unstable API that is subject to change or removal at any time.*
+
 ## Features
 
 - Fetches weather for hmm important 'port' locations yes
 - ~~Reminders~~
-- Daily counter incrementation via regex (very specific)
+- Daily counter incrementation via regex (very specific). (Should move to Temporal API)
 - Joining & leaving logging
 
 ## Deploying

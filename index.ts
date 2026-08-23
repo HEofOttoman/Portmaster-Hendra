@@ -144,36 +144,50 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
 
 app.action(`join-t1`, async ({ ack, body, client, logger}) => {
   await ack();
+  try {
 
-  await client.conversations.invite({
-    users: body.user.id,
-    channel: `C0AMVTVLH4Y`
-  });
+    /* const joinResponse = await client.conversations.join({ channel: `C0AMVTVLH4Y` })
 
-  console.log(`User joined via button`);
+    if (joinResponse.warning == 'already_in_channel') {
+      logger.warn(`User attempting to join via home is already in the channel`)
+      return;
+    }*/
+
+    await client.conversations.invite({
+      users: body.user.id,
+      channel: `C0AMVTVLH4Y`
+    });
+  
+  logger.info(`Added <@${body.user.id}> to pc via home page`)
+  
+  console.log(`User joined via button`);  
+  } catch (error) {
+    console.log(error);
+  }
   
 })
 
-app.action(`leave-ping`, async ({ ack, body, client, say, logger }) => {
+app.action(`leave-ping`, async ({ ack, body, client, logger }) => {
   await ack();
 
-  let groupUsers = await client.usergroups.users.list({
+  const groupUsers = await client.usergroups.users.list({
     usergroup: `S0ANEQMV7UJ`
   })
 
-  let currentMembers = groupUsers.users;
+  const currentMembers = groupUsers.users;
 
   if (currentMembers?.includes(body.user.id)) {
-    currentMembers.splice(currentMembers.findIndex(user => user.id  == currentMembers ), 1);
+    currentMembers.splice(currentMembers.indexOf(body.user.id, 1));
 
   }
 
   await client.usergroups.users.update({
     usergroup: `S0ANEQMV7UJ`,
-    users: body.user.id
+    users: currentMembers?.join(',')?? `` // Empty string fallback. 
   });
 
-  say(`Removed you from the ping group!`);
+  // say(`Removed you from the ping group!`);
+  logger.info(`Added user <@${body.user.id}>`)
 
 })
 
@@ -273,9 +287,20 @@ app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) =>
       return; // Ignore any other channel
     }
     
+    const groupUsers = await client.usergroups.users.list({
+      usergroup: `S0ANEQMV7UJ`
+    })
+
+    /*if (currentMembers?.includes(body.user.id)) {
+      console.log('User is already in the group.');
+    } else {
+      currentMembers?.push(body.user.id);
+    }*/
+
+
     await client.usergroups.users.update({ // Add to client
       usergroup: `S0ANEQMV7UJ`,
-      users: event.user
+      users: groupUsers.users?.join(',')?? ownerID // Always comma separate.
     });
 
     await client.chat.postEphemeral({
@@ -326,7 +351,7 @@ app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) =>
     console.log(error);
   }
 
-  await dmOwner(ownerID, `User <@${event.user}> has joined your channel ${event.channel}! :D`)
+  await dmOwner(ownerID, `User <@${event.user}> has joined your channel <#${event.channel}>! :D`)
 
 });
 
@@ -334,7 +359,7 @@ app.event("member_left_channel", async ({ event, /*say, /*client,*/ logger }) =>
   try {
     // await say(`bye..`)
 
-    await dmOwner(ownerID, `User <@${event.user}> has left ${event.channel} channel :<`)
+    await dmOwner(ownerID, `User <@${event.user}> has left <#${event.channel}> :<`)
 
   } catch (error) {
     logger.error("Error handling event:", error);

@@ -188,7 +188,7 @@ app.command("/weather-ports", async ({ /*command,*/ ack, respond }) => {
 app.command("/hendra-help", async ({ command, ack, respond }) => {
   await ack();
   await respond({
-    text: `No problem <@${command.user_id}>, commands:
+    text: `No problemo <@${command.user_id}>, here are my commands:
         /hendra-ping - speed
         /hendra - huh
         /hendra-help
@@ -213,7 +213,7 @@ app.command("/hendra-channel", async ({ ack, command, respond }) => {
 
 app.event("app_mention", async ({ event, say, client, logger }) => {
   try {
-    console.log(event.user);
+    console.log(` User ${event.user_profile?.name}, ID ${event.user} invoked me.`);
 
     await client.reactions.add({
       name: `canberraisbetterthansydney`,
@@ -222,7 +222,7 @@ app.event("app_mention", async ({ event, say, client, logger }) => {
     });
     await say({
       text: `hi. yes?`, 
-      thread_ts: event.thread_ts
+      thread_ts: event.event_ts
     });
 
   } catch (error) {

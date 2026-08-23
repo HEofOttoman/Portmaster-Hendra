@@ -16,13 +16,20 @@ SDK & Deno. I use Deno because why not.
 - Joining & leaving logging via DMing to the owner, and also welcoming
 - App home page with the information
 
+### Commands List
+1. `/hendra-help`
+2. `/hendra-channel`
+3. `/hendra-ping`
+4. `/sailsouth` - Joins the channel
+
 ## Deploying
 1. Install Deno, `deno init`, and its dependencies, `deno install`.
-2. Run the following command
-```deno run --unstable-cron index.ts```
+2. Create a `.env` file using `.env.example`, inserting your own tokens as needed. 
+3. Run the following command:
+```deno run index.ts```
     >The `--unstable-cron` flag is pre-defined in `deno.json`
-3. Accept all requested permissions
-4. do what you need to do.
+4. Accept all requested permissions
+5. Do what you need to do!
 
 <!-- ## Gallery
 

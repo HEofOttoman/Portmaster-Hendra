@@ -146,25 +146,26 @@ app.action(`join-t1`, async ({ ack, body, client, logger}) => {
   await ack();
   try {
 
-    /* const joinResponse = await client.conversations.join({ channel: `C0AMVTVLH4Y` })
-
-    if (joinResponse.warning == 'already_in_channel') {
-      logger.warn(`User attempting to join via home is already in the channel`)
-      return;
-    }*/
+    // const joinResponse = await client.conversations.join({ channel: `C0AMVTVLH4Y` })
+    const memberResponse = await client.conversations.members({ channel: `C0AMVTVLH4Y` });
+    const isUserInChannel = memberResponse.members?.includes(body.user.id);
+    if (isUserInChannel) {
+      logger.warn(`User <@${body.user.id} attempted to join, but was in the channel.`);
+    }
 
     await client.conversations.invite({
       users: body.user.id,
       channel: `C0AMVTVLH4Y`
     });
-  
-  logger.info(`Added <@${body.user.id}> to pc via home page`)
-  
-  console.log(`User joined via button`);  
-  } catch (error) {
-    console.log(error);
-  }
-  
+    
+    dmOwner(body.user.id, `You've embarked. Arriving soon. To <#C0AMVTVLH4Y>.`)
+    
+    logger.info(`Added <@${body.user.id}> to pc via home page`)
+    
+    console.log(`User joined via button`);  
+    } catch (error) {
+      console.log(error);
+    }  
 })
 
 app.action(`leave-ping`, async ({ ack, body, client, logger }) => {
@@ -178,7 +179,8 @@ app.action(`leave-ping`, async ({ ack, body, client, logger }) => {
 
   if (currentMembers?.includes(body.user.id)) {
     currentMembers.splice(currentMembers.indexOf(body.user.id, 1));
-
+  } else {
+    logger.warn("Member is/was not part of ping group");
   }
 
   await client.usergroups.users.update({
@@ -187,7 +189,8 @@ app.action(`leave-ping`, async ({ ack, body, client, logger }) => {
   });
 
   // say(`Removed you from the ping group!`);
-  logger.info(`Added user <@${body.user.id}>`)
+  logger.info(`Removed user <@${body.user.id}> from ping group`);
+  dmOwner(ownerID, `User <@${body.user.id}> left <@S0ANEQMV7UJ> group.`);
 
 })
 
@@ -291,12 +294,12 @@ app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) =>
       usergroup: `S0ANEQMV7UJ`
     })
 
-    /*if (currentMembers?.includes(body.user.id)) {
+    if (groupUsers.users?.includes(event.user)) {
       console.log('User is already in the group.');
+      // logger.warn(`User is already in the ping group`);
     } else {
-      currentMembers?.push(body.user.id);
-    }*/
-
+      groupUsers.users?.push(event.user);
+    }
 
     await client.usergroups.users.update({ // Add to client
       usergroup: `S0ANEQMV7UJ`,
@@ -306,8 +309,15 @@ app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) =>
     await client.chat.postEphemeral({
       user: event.user,
       channel: event.channel,
-      text: `<@${event.user}, welcome to henry's place. I've added you to his ping group, click here to leave.`,
+      text: `<@${event.user}>, welcome to henry's place. I've added you to his ping group.`,
       blocks: [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": `<@${event.user}>, welcome to henry's place. I've added you to his ping group, click here to leave.`
+          }
+        },
         {
           "type": "section",
           "text": {
@@ -327,7 +337,7 @@ app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) =>
           }
         }
       ]
-    })
+    });
     /* "accessory": {
             "type": "button",
             "style": "primary",
@@ -367,7 +377,7 @@ app.event("member_left_channel", async ({ event, /*say, /*client,*/ logger }) =>
   }
 });
 
-// Sends a DM to specified user. 
+// Despite the name, this function sends a DM to specified user. 
 async function dmOwner(userID: string, text: string) {
   try {
     

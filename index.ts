@@ -127,7 +127,8 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
               "emoji": true
             },
             "value": "join_btn",
-            "action_id": "button-action"
+            "action_id": "join-t1"
+            
           }
         }
       ]
@@ -140,6 +141,41 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
     logger.error(error);
   }
 });
+
+app.action(`join-t1`, async ({ ack, body, client, logger}) => {
+  await ack();
+
+  await client.conversations.invite({
+    users: body.user.id,
+    channel: `C0AMVTVLH4Y`
+  });
+
+  console.log(`User joined via button`);
+  
+})
+
+app.action(`leave-ping`, async ({ ack, body, client, say, logger }) => {
+  await ack();
+
+  let groupUsers = await client.usergroups.users.list({
+    usergroup: `S0ANEQMV7UJ`
+  })
+
+  let currentMembers = groupUsers.users;
+
+  if (currentMembers?.includes(body.user.id)) {
+    currentMembers.splice(currentMembers.findIndex(user => user.id  == currentMembers ), 1);
+
+  }
+
+  await client.usergroups.users.update({
+    usergroup: `S0ANEQMV7UJ`,
+    users: body.user.id
+  });
+
+  say(`Removed you from the ping group!`);
+
+})
 
 app.command("/sailsouth", async ({ command, ack, respond, client }) => {
   await ack();
@@ -262,7 +298,7 @@ app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) =>
               "emoji": true
             },
             "value": "leave_btn",
-            "action_id": "button-action"
+            "action_id": "leave-ping"
           }
         }
       ]
@@ -331,11 +367,11 @@ async function dmOwner(userID: string, text: string) {
 }
 
 // 0 0 * * *
-Deno.cron("Update 365 days count", `* * * * *`, () => { // * * * * * would be every minute. Put that in for tests. It's also in UTC btw
+Deno.cron("Update 365 days count", `0 0 * * *`, () => { // * * * * * would be every minute. Put that in for tests. It's also in UTC btw
   try {
     updateDayCount(`C0BNS59V22V`); // Public test channel
-    // updateDayCount(`C0A63BZ2AQN`); // 365 days channel
-    // updateDayCount(`C0AMVTVLH4Y`); // Personal channel
+    updateDayCount(`C0A63BZ2AQN`); // 365 days channel
+    updateDayCount(`C0AMVTVLH4Y`); // Personal channel
   } catch (error) {
     console.log(error);
   }

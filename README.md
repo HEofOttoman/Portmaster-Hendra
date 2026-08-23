@@ -1,25 +1,32 @@
 # Portmaster Hendra
-![hendra aww look at him so tired](https://cdn.hackclub.com/019fd13c-0b7c-7fc5-8e3f-ceb8f7c7d1ab/slack_n_hendra.png)
+![hendra, aww look at him so tired](https://cdn.hackclub.com/019fd13c-0b7c-7fc5-8e3f-ceb8f7c7d1ab/slack_n_hendra.png)
 
 An assistant & bot for my personal Slack channel, made using the Slack BoltJS
-SDK. I use Deno because why not.
+SDK & Deno. I use Deno because why not.
 
 > [!Warning] 
-> This project uses Deno.cron(), which has the warning:
-> *Warning: This is an unstable API that is subject to change or removal at any time.*
+> To schedule tasks, this project uses `Deno.cron()`, which itself is attached the warning:
+> >*Warning: This is an unstable API that is subject to change or removal at any time.*
 
 ## Features
 
 - Fetches weather for hmm important 'port' locations yes
-- ~~Reminders~~
+- ~~Reminders~~ Maybe of some sort
 - Daily counter incrementation via regex (very specific). (Should move to Temporal API)
-- Joining & leaving logging
+- Joining & leaving logging via DMing to the owner, and also welcoming
+- App home page with the information
 
 ## Deploying
 1. Install Deno, `deno init`, and its dependencies, `deno install`.
 2. Run the following command
 ```deno run --unstable-cron index.ts```
+    >The `--unstable-cron` flag is pre-defined in `deno.json`
 3. Accept all requested permissions
+4. do what you need to do.
+
+<!-- ## Gallery
+
+-->
 
 ## Contributors
 

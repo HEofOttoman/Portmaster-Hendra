@@ -17,7 +17,7 @@ interface Trigger {
 const ownerID = process.env.OWNER_UUID; // Aka allowedUser
 const botToken = process.env.SLACK_BOT_TOKEN;
 const appToken = process.env.SLACK_APP_TOKEN;
-const ownedChannels = ["C0AMVTVLH4Y","C0BB6HQDUBE"];
+const ownedChannels = ["C0AMVTVLH4Y", "C0BB6HQDUBE", "C0BNS59V22V"];
 
 if (!botToken || !appToken || !ownerID) { // Missing env safeguard
   throw new Error("Missing environment variables. Check for your bot & app tokens.");
@@ -316,7 +316,7 @@ async function dmOwner(userID: string, text: string) {
 // 0 0 * * *
 Deno.cron("Update 365 days count", `* * * * *`, () => { // * * * * * would be every minute. Put that in for tests. It's also in UTC btw
   try {
-    updateDayCount(`C0BNS59V22`); // Public test channel
+    updateDayCount(`C0BNS59V22V`); // Public test channel
     // updateDayCount(`C0A63BZ2AQN`);
   } catch (error) {
     console.log(error);
@@ -333,17 +333,18 @@ async function updateDayCount(channel_id: string) {
   const currentTopic = daysInfo?.["channel"]?.["topic"]?.["value"];
   const regexMatch = currentTopic?.match(dailyCounterRegex);
 
-  let dayCount; 
+  let dayCount;
   if (!regexMatch) { // guard against is possibly 'null' or 'undefined'.
     console.log("No match found");
-    // return;
+    return;
   } else {
-    dayCount = 1 + regexMatch[1];
+    dayCount = parseInt(regexMatch[1]);
   }
   // let dayCount = 224;
+  const nextDay = 1 + dayCount;
 
   // const newTopic = currentTopic?.replace( /insertregexaqui/, currentTopic);
-  const newTopic = currentTopic?.replace( dailyCounterRegex, currentTopic);
+  const newTopic = currentTopic?.replace( dailyCounterRegex, `Day ${nextDay}/365`);
 
   await app.client.conversations.setTopic({
     // twas 224

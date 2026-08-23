@@ -178,7 +178,8 @@ app.action(`leave-ping`, async ({ ack, body, client, logger }) => {
   const currentMembers = groupUsers.users;
 
   if (currentMembers?.includes(body.user.id)) {
-    currentMembers.splice(currentMembers.indexOf(body.user.id, 1));
+    currentMembers.splice(currentMembers.indexOf(body.user.id), 1);
+    // look into using currentMembers.filter();
   } else {
     logger.warn("Member is/was not part of ping group");
   }
@@ -190,7 +191,7 @@ app.action(`leave-ping`, async ({ ack, body, client, logger }) => {
 
   // say(`Removed you from the ping group!`);
   logger.info(`Removed user <@${body.user.id}> from ping group`);
-  dmOwner(ownerID, `User <@${body.user.id}> left <@S0ANEQMV7UJ> group.`);
+  dmOwner(ownerID, `User <@${body.user.id}> left <@${`S0ANEQMV7UJ`}> group.`);
 
 })
 
@@ -289,7 +290,13 @@ app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) =>
     if (!ownedChannels.includes(event.channel)) {
       return; // Ignore any other channel
     }
-    
+
+    /*await client.reactions.add({ // Target that join message. For another day
+      name: `hyper-dino-wave`,
+      channel: event.channel,
+      timestamp: event.event_ts
+    });*/
+
     const groupUsers = await client.usergroups.users.list({
       usergroup: `S0ANEQMV7UJ`
     })

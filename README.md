@@ -13,14 +13,15 @@ SDK & Deno. I use Deno because why not.
 - Fetches weather for hmm important 'port' locations yes
 - ~~Reminders~~ Maybe of some sort
 - Daily counter incrementation via regex (very specific). (Should move to Temporal API)
-- Joining & leaving logging via DMing to the owner, and also welcoming
-- App home page with the information
+- Joining & leaving logging via DMing to the owner, welcoming to the channel as well!
+- App home page with some relevant information
 
 ### Commands List
-1. `/hendra-help`
-2. `/hendra-channel`
-3. `/hendra-ping`
+1. `/hendra-help` - lists some of the commands
+2. `/hendra-channel` - we have at-channel at home
+3. `/hendra-ping` - checks latency
 4. `/sailsouth` - Joins the channel
+5. `/weather-ports` - Displays weather reports for 4 different locations.
 
 ## Deploying
 1. Install Deno, `deno init`, and its dependencies, `deno install`.
@@ -31,15 +32,14 @@ SDK & Deno. I use Deno because why not.
 4. Accept all requested permissions
 5. Do what you need to do!
 
-<!-- ## Gallery
-
--->
+## Gallery
+![leave btn](https://cdn.hackclub.com/01a02f7a-24ba-7781-be60-a57f1e9f9ea9/image.png)
 
 ## Contributors
 
 - Henry Wauzivuff
 - sonion it's me
-- AI used for answering why the timestamps didn't line up and also for the *regex*
+- AI used for answering why the openmeteo timestamps didn't line up and also for the *regex*
 
 
 Inspired by gork, gorkie & warden

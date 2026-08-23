@@ -1,6 +1,6 @@
 // require("dotenv").config();
 
-import { App, onlyViewActions } from "@slack/bolt";
+import { App /*, onlyViewActions*/ } from "@slack/bolt";
 
 import "@std/dotenv/load";
 import process from "node:process"; // <- Added because NodeJS process global is discouraged in Deno
@@ -144,6 +144,8 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
 app.command("/sailsouth", async ({ command, ack, respond, client }) => {
   await ack();
   
+  await respond({ text: `You have invoked the coordinate. Sailing...` }) 
+  
   await client.conversations.invite({
     users: command.user_id,
     channel: `C0AMVTVLH4Y`,
@@ -151,35 +153,42 @@ app.command("/sailsouth", async ({ command, ack, respond, client }) => {
 
 })
 
-app.command("/hendra", async ({ command, ack, respond }) => {
+app.command("/hendra", async ({ /*command,*/ ack, respond }) => {
   await ack();
   await respond({ text: `yes what whar huh what? im up boss` });
 });
 
-app.command("/hendra-ping", async ({ command, ack, respond }) => {
+app.command("/hendra-ping", async ({ /*command,*/ ack, respond }) => {
   const start = Date.now();
   await ack();
   const latency = Date.now() - start;
-  await respond({ text: `ugh fine. Pong!\nLatency: ${latency}ms` });
+  await respond({ text: `yes boss. Pong!\nLatency: ${latency}ms` });
 });
 
 // put in chat.scheduleMessage somewhere
 
-app.command("/weather-ports", async ({ command, ack, respond }) => {
+app.command("/weather-ports", async ({ /*command,*/ ack, respond }) => {
   await ack();
 
   const msg = await getCurrentWeather();
 
   await respond({
     text: msg,
-    // blocks: [],
+    /*blocks: [
+      {
+        "subtitle": {
+          "type": "mrkdwn",
+          "text": `Requested by you, <@${command.user_id}>`
+        }
+      }
+    ],*/
   });
 });
 
 app.command("/hendra-help", async ({ command, ack, respond }) => {
   await ack();
   await respond({
-    text: `Commands:
+    text: `No problem <@${command.user_id}>, commands:
         /hendra-ping - speed
         /hendra - huh
         /hendra-help
@@ -206,12 +215,23 @@ app.event("app_mention", async ({ event, say, client, logger }) => {
   try {
     console.log(event.user);
 
+    await client.reactions.add({
+      name: `canberraisbetterthansydney`,
+      channel: event.channel,
+      timestamp: event.ts
+    });
+    await say({
+      text: `hi. yes?`, 
+      thread_ts: event.thread_ts
+    });
+
   } catch (error) {
     console.log(error);
+    logger.error("Error handling event:", error);
   }
 })
 
-app.event("member_joined_channel", async ({ event, say, client, logger }) => {
+app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) => {
   try {
     if (!ownedChannels.includes(event.channel)) {
       return; // Ignore any other channel
@@ -270,18 +290,15 @@ app.event("member_joined_channel", async ({ event, say, client, logger }) => {
     console.log(error);
   }
 
-  await dmOwner(ownerID, `User <@${event.user}> has joined your channel! :D`)
+  await dmOwner(ownerID, `User <@${event.user}> has joined your channel ${event.channel}! :D`)
 
 });
 
-app.event("member_left_channel", async ({ event, /*say,*/ client, logger }) => {
+app.event("member_left_channel", async ({ event, /*say, /*client,*/ logger }) => {
   try {
-    // await client.chat.postMessage({
-    //   channel: event.channel,
-    //   text: `bye...`,
-    // });
+    // await say(`bye..`)
 
-    await dmOwner(ownerID, `User <@${event.user}> has left your channel :<`)
+    await dmOwner(ownerID, `User <@${event.user}> has left ${event.channel} channel :<`)
 
   } catch (error) {
     logger.error("Error handling event:", error);

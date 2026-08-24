@@ -165,12 +165,14 @@ app.action(`join-t1`, async ({ ack, body, client, logger}) => {
     console.log(`User joined via button`);  
     } catch (error) {
       console.log(error);
+      logger.error(error);
     }  
 })
 
 app.action(`leave-ping`, async ({ ack, body, client, logger }) => {
   await ack();
-
+  // try {} catch (error) {}
+  
   const groupUsers = await client.usergroups.users.list({
     usergroup: `S0ANEQMV7UJ`
   })
@@ -423,32 +425,35 @@ Deno.cron("Update 365 days count", `0 0 * * *`, () => { // * * * * * would be ev
 const dailyCounterRegex = /Day\s+(\d+)\/365/i; // This regex looks for a pattern of `Day x/365`, ignoring the following. 
 // Dynamically access a day count from a channel topic using regex
 async function updateDayCount(channel_id: string) {
-  
-  const daysInfo = await app.client.conversations.info({channel: channel_id});
-  const currentTopic = daysInfo?.["channel"]?.["topic"]?.["value"];
-  const regexMatch = currentTopic?.match(dailyCounterRegex);
+  try {
+    const daysInfo = await app.client.conversations.info({channel: channel_id});
+    const currentTopic = daysInfo?.["channel"]?.["topic"]?.["value"];
+    const regexMatch = currentTopic?.match(dailyCounterRegex);
 
-  let dayCount;
-  if (!regexMatch) { // guard against is possibly 'null' or 'undefined'.
-    console.log("No match found");
-    return;
-  } else {
-    dayCount = parseInt(regexMatch[1]);
+    let dayCount;
+    if (!regexMatch) { // guard against is possibly 'null' or 'undefined'.
+      console.log("No match found");
+      return;
+    } else {
+      dayCount = parseInt(regexMatch[1]);
+    }
+    const nextDay = 1 + dayCount;
+
+    // const newTopic = currentTopic?.replace( /insertregexaqui/, currentTopic);
+    const newTopic = currentTopic?.replace( dailyCounterRegex, `Day ${nextDay}/365`);
+
+    const currentName = daysInfo?.["channel"]?.["name"];
+    await app.client.conversations.setTopic({
+      // twas 224
+      topic: newTopic ?? `${currentTopic}`, // Nullish coalescing apparently thx goog
+      channel: channel_id // Update 365 days
+    })
+
+    console.log(`Channel day count for #${currentName} (${channel_id}) successfully updated! Day ${nextDay}/365`)  
+  } catch (error) {
+    console.log(error);  
   }
-  const nextDay = 1 + dayCount;
-
-  // const newTopic = currentTopic?.replace( /insertregexaqui/, currentTopic);
-  const newTopic = currentTopic?.replace( dailyCounterRegex, `Day ${nextDay}/365`);
-
-  const currentName = daysInfo?.["channel"]?.["name"];
-  await app.client.conversations.setTopic({
-    // twas 224
-    topic: newTopic ?? `${currentTopic}`, // Nullish coalescing apparently thx goog
-    channel: channel_id // Update 365 days
-  })
-
-  console.log(`Channel day count for #${currentName} (${channel_id}) successfully updated! Day ${nextDay}/365`)
-}
+};
 
 /* async function sendReminder(channelID: string, reminderName: string, reminderText: string, scheduledTime: string) {
   try {

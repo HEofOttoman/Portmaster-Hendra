@@ -32,6 +32,17 @@ SDK & Deno. I use Deno because why not.
 4. Accept all requested permissions
 5. Do what you need to do!
 
+6. To run it 24/7, persisting after restarts, enable the systemd service (or use screen).
+    ```
+    # Make service (take hendra.service from this repo)
+    systemctl enable hendra.service --now
+    # Check status of service
+    systemctl status <name>.service
+    # View logs of service
+    journalctl -eu <name>
+    ```
+    >Taken from [Nest guides](https://guides.hackclub.app/index.php/Systemd) <3
+
 ## Gallery
 ![leave btn](https://cdn.hackclub.com/01a02f7a-24ba-7781-be60-a57f1e9f9ea9/image.png)
 

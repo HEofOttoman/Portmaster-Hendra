@@ -1,0 +1,17 @@
+[Unit]
+Description=Personal Slack Bot
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+# Deno executable path, project path
+ExecStart=/root/.deno/bin/deno /root/Portmaster-Hendra/index.ts
+WorkingDirectory=/root/Portmaster-Hendra
+Restart=always
+RestartSec=5
+
+# .env File
+EnvironmentFile=/root/Portmaster-Hendra/.env
+
+[Install]
+multi-user.target

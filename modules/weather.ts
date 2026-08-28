@@ -125,159 +125,6 @@ for (const response of responses) {
 	// console.log("\Daily data:\n", weatherData.daily)
 }
 
-
-// JSON file for slack blockkit
-const weatherupdateTemplate = {
-	"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "It is currently ${CURRENT_TIME}. Here's how weather's looking elsewhere:"
-			}
-		},
-		{
-			"type": "divider"
-		},
-		{
-			"type": "carousel",
-			"elements": [
-				{
-					"type": "card",
-					"block_id": "carousel-card-1",
-					// "icon": {
-						// "type": "image",
-						// "image_url": "https://picsum.photos/36/36",
-						// "alt_text": "Icon"
-					// },
-					"title": {
-						"type": "mrkdwn",
-						"text": "${LOCATION_NAME}",
-						"verbatim": false
-					},
-					"subtitle": {
-						"type": "mrkdwn",
-						"text": "This is a subtitle",
-						"verbatim": false
-					},
-					// "hero_image": {
-					// 	"type": "image",
-					// 	"image_url": "https://picsum.photos/400/300",
-					// 	"alt_text": "Sample hero image"
-					// },
-					"body": {
-						"type": "mrkdwn",
-						"text": 
-						"Temperature, Precipitation, Rain, Showers, snowfall, snow depth, weather code",
-						"verbatim": false
-					},
-				},
-				{
-					"type": "card",
-					"block_id": "carousel-card-2",
-					// "icon": {
-					// 	"type": "image",
-					// 	"image_url": "https://picsum.photos/36/36",
-					// 	"alt_text": "Icon"
-					// },
-					"title": {
-						"type": "mrkdwn",
-						"text": "LOCATION_NAME",
-						"verbatim": false
-					},
-					"subtitle": {
-						"type": "mrkdwn",
-						"text": "CURRENT_TIME",
-						"verbatim": false
-					},
-					// "hero_image": {
-					// 	"type": "image",
-					// 	"image_url": "https://picsum.photos/400/300",
-					// 	"alt_text": "Sample hero image"
-					// },
-					"body": {
-						"type": "mrkdwn",
-						"text": "<Insert weather data>",
-						"verbatim": false
-					},
-					"actions": [
-						{
-							"type": "button",
-							"text": {
-								"type": "plain_text",
-								"text": "Action Button",
-								"emoji": false
-							},
-							"action_id": "button_action_2"
-						}
-					]
-				},
-				{
-					"type": "card",
-					"block_id": "carousel-card-3",
-					// "icon": {
-					// 	"type": "image",
-					// 	"image_url": "https://picsum.photos/36/36",
-					// 	"alt_text": "Icon"
-					// },
-					"title": {
-						"type": "mrkdwn",
-						"text": "LOCATION_NAME",
-						"verbatim": false
-					},
-					"subtitle": {
-						"type": "mrkdwn",
-						"text": "CURRENT_TIME",
-						"verbatim": false
-					},
-					// "hero_image": {
-					// 	"type": "image",
-					// 	"image_url": "https://picsum.photos/400/300",
-					// 	"alt_text": "Sample hero image"
-					// },
-					"body": {
-						"type": "mrkdwn",
-						"text": "<Insert weather data>",
-						"verbatim": false
-					},
-				},
-				{
-					"type": "card",
-					"block_id": "carousel-card-4",
-					// "icon": {
-					// 	"type": "image",
-					// 	"image_url": "https://picsum.photos/36/36",
-					// 	"alt_text": "Icon"
-					// },
-					"title": {
-						"type": "mrkdwn",
-						"text": "LOCATION_NAME",
-						"verbatim": false
-					},
-					"subtitle": {
-						"type": "mrkdwn",
-						"text": "CURRENT_TIME",
-						"verbatim": false
-					},
-					// "hero_image": {
-					// 	"type": "image",
-					// 	"image_url": "https://picsum.photos/400/300",
-					// 	"alt_text": "Sample hero image"
-					// },
-					"body": {
-						"type": "mrkdwn",
-						"text": "<Insert weather data>",
-						"verbatim": false
-					},
-				}
-			]
-		},
-		{
-			"type": "divider"
-		}
-	]
-}
-
 export interface currentWeather {
 	time: Date;
 	temperature: number;
@@ -341,7 +188,7 @@ export function buildPayload(locations: localWeather[]) {
 };
 
 // Parses data
-export async function fetchData() {
+export async function fetchWeatherData() {
 	// okay cleaning up this architecture
 	// This should like get purely the current weather, returning values, which would be parsed by another function?
 	try {
@@ -434,12 +281,12 @@ export async function fetchData() {
 
 		return dataParsed;
 	} catch(error) {
-		console.error("Openmeteo API Error: ", error);
-		return "sorry, I couldn't fetch any weather data 🥀"
+		console.error("sorry, I couldn't fetch any weather data 🥀, Openmeteo API Error: ", error);
+		return;
 	}
 }
 
-export async function getCurrentWeather() {
+/*export async function getCurrentWeather() {
 	// const newdataresponse = await fetchWeatherApi(url, params);
 	
 	await weatherupdateTemplate;
@@ -535,4 +382,4 @@ export async function getCurrentWeather() {
 		console.error("Openmeteo API Error: ", error);
 		return "sorry, I couldn't find any weather data 🥀"
 	};
-};
+};*/

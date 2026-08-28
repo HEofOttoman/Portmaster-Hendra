@@ -5,7 +5,7 @@ import { App /*, onlyViewActions*/ } from "@slack/bolt";
 import "@std/dotenv/load";
 import process from "node:process"; // <- Added because NodeJS process global is discouraged in Deno
 
-import { getCurrentWeather } from "./modules/weather.ts"; // oh i forgor the ./
+import { fetchWeatherData, buildPayload } from "./modules/weather.ts"; // oh i forgor the ./
 // import PROMPT from "prompt.md"
 type TriggerType = "ping"; // from gorkie
 
@@ -80,7 +80,7 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
         },
         {
           "type": "divider"
-        },
+        }, // insert weather info here
         {
           "type": "carousel",
           "elements": [
@@ -221,6 +221,7 @@ app.command("/hendra-ping", async ({ /*command,*/ ack, respond }) => {
   await ack();
   const latency = Date.now() - start;
   await respond({ text: `yes boss. Pong!\nLatency: ${latency}ms` });
+  // dmOwner(ownerID, `you are, <@${ownerID}>, channel owned <#${`C0AMVTVLH4Y`}> and your ping group is <!subteam^${pingGroupID}>.`) // helped debug links
 });
 
 // put in chat.scheduleMessage somewhere
@@ -228,10 +229,12 @@ app.command("/hendra-ping", async ({ /*command,*/ ack, respond }) => {
 app.command("/weather-ports", async ({ /*command,*/ ack, respond }) => {
   await ack();
 
-  const msg = await getCurrentWeather();
+  const locationsData = await fetchWeatherData();
+  const msg = buildPayload(locationsData ?? []);
 
   await respond({
-    text: msg,
+    text: `Weather of the ports:`,
+    blocks: msg.blocks
     /*blocks: [
       {
         "subtitle": {

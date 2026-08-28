@@ -298,22 +298,34 @@ export interface localWeather {
 	weatherCurrent: currentWeather;
 }
 
-export async function buildPayload(locations: currentWeather[]) {
+export async function buildPayload(locations: localWeather[]) {
 	return { // taken fromn updateTemplate.json
 	blocks: [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "It is currently ${CURRENT_TIME}. Here's how weather's looking elsewhere:"
+				"text": `It is currently ${new Date().toLocaleTimeString()}. Here's how weather's looking elsewhere:`
 			}
 		},
-		{
-			"type": "divider"
-		},
+		{	"type": "divider"	},
 		{
 			"type": "carousel",
-			"elements": [
+			"elements": locations.map((loc, index) => {
+				"type": "card",
+				"block_id": `location-card-${index}`,
+				"title": {
+					"type": "mrkdwn",
+					"text": location.name,
+				},
+				"subtitle": {
+					"type": "mrkdwn",
+					"text": location.current.time.toLocaleTimeString("en-AU", {
+						timeZone: locations.timezone,
+					})
+				}
+			}),
+			/*[
 				{
 					"type": "card",
 					"block_id": "carousel-card-1",
@@ -333,82 +345,13 @@ export async function buildPayload(locations: currentWeather[]) {
 						"Temperature, Precipitation, Rain, Showers, snowfall, snow depth, weather code",
 						"verbatim": false
 					}
-				},
-				{
-					"type": "card",
-					"block_id": "carousel-card-2",
-					"title": {
-						"type": "mrkdwn",
-						"text": "LOCATION_NAME",
-						"verbatim": false
-					},
-					"subtitle": {
-						"type": "mrkdwn",
-						"text": "CURRENT_TIME",
-						"verbatim": false
-					},
-					"body": {
-						"type": "mrkdwn",
-						"text": "<Insert weather data>",
-						"verbatim": false
-					},
-					"actions": [
-						{
-							"type": "button",
-							"text": {
-								"type": "plain_text",
-								"text": "Action Button",
-								"emoji": false
-							},
-							"action_id": "button_action_2"
-						}
-					]
-				},
-				{
-					"type": "card",
-					"block_id": "carousel-card-3",
-					"title": {
-						"type": "mrkdwn",
-						"text": "LOCATION_NAME",
-						"verbatim": false
-					},
-					"subtitle": {
-						"type": "mrkdwn",
-						"text": "CURRENT_TIME",
-						"verbatim": false
-					},
-					"body": {
-						"type": "mrkdwn",
-						"text": "<Insert weather data>",
-						"verbatim": false
-					}
-				},
-				{
-					"type": "card",
-					"block_id": "carousel-card-4",
-					"title": {
-						"type": "mrkdwn",
-						"text": "LOCATION_NAME",
-						"verbatim": false
-					},
-					"subtitle": {
-						"type": "mrkdwn",
-						"text": "CURRENT_TIME",
-						"verbatim": false
-					},
-					"body": {
-						"type": "mrkdwn",
-						"text": "<Insert weather data>",
-						"verbatim": false
-					}
 				}
-			]
-		},
+			]*/
 		{
 			"type": "divider"
-		}
-	]
-	}
+		},
+	],
+	};
 }
 
 export async function fetchData() {

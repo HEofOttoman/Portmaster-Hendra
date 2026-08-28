@@ -1,8 +1,8 @@
 # Portmaster Hendra
 ![hendra, aww look at him so tired](https://cdn.hackclub.com/019fd13c-0b7c-7fc5-8e3f-ceb8f7c7d1ab/slack_n_hendra.png)
 
-An assistant & bot for my personal Slack channel, made using the Slack BoltJS
-SDK & Deno. I use Deno because why not.
+An assistant & bot for my personal Slack channel, made using the Slack Bolt
+SDK with Deno, fetching data from the Openmeteo API. I use Deno because why not.
 
 > [!Warning] 
 > To schedule tasks, this project uses `Deno.cron()`, which itself is attached the warning:

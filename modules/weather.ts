@@ -278,9 +278,224 @@ const weatherupdateTemplate = {
 	]
 }
 
+export interface currentWeather {
+	time: Date;
+	temperature: number;
+	precipitation: number;
+	rain: number;
+	showers: number;
+	snowfall: number;
+	isDay: boolean;
+	weatherCode: number;
+	clouds: number;
+}
+
+export interface localWeather {
+	name: string;
+	timezone: string;
+	timezoneAbbreviation: string;
+	elevation: number;
+	weatherCurrent: currentWeather;
+}
+
+export async function buildPayload(locations: currentWeather[]) {
+	return { // taken fromn updateTemplate.json
+	blocks: [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "It is currently ${CURRENT_TIME}. Here's how weather's looking elsewhere:"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "carousel",
+			"elements": [
+				{
+					"type": "card",
+					"block_id": "carousel-card-1",
+					"title": {
+						"type": "mrkdwn",
+						"text": "${LOCATION_NAME}",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "This is a subtitle",
+						"verbatim": false
+					},
+					"body": {
+						"type": "mrkdwn",
+						"text": 
+						"Temperature, Precipitation, Rain, Showers, snowfall, snow depth, weather code",
+						"verbatim": false
+					}
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-2",
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					},
+					"actions": [
+						{
+							"type": "button",
+							"text": {
+								"type": "plain_text",
+								"text": "Action Button",
+								"emoji": false
+							},
+							"action_id": "button_action_2"
+						}
+					]
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-3",
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					}
+				},
+				{
+					"type": "card",
+					"block_id": "carousel-card-4",
+					"title": {
+						"type": "mrkdwn",
+						"text": "LOCATION_NAME",
+						"verbatim": false
+					},
+					"subtitle": {
+						"type": "mrkdwn",
+						"text": "CURRENT_TIME",
+						"verbatim": false
+					},
+					"body": {
+						"type": "mrkdwn",
+						"text": "<Insert weather data>",
+						"verbatim": false
+					}
+				}
+			]
+		},
+		{
+			"type": "divider"
+		}
+	]
+	}
+}
+
 export async function fetchData() {
 	// okay cleaning up this architecture
 	// This should like get purely the current weather, returning values, which would be parsed by another function?
+	try {
+		const data = await fetchWeatherApi(url, params);
+
+		let messages = [];
+		for (const response of data) {			
+			const latitude = response.latitude();
+			const longitude = response.longitude();
+			const elevation = response.elevation();
+			const timezone = response.timezone();
+			const timezoneAbbreviation = response.timezoneAbbreviation();
+			const utcOffsetSeconds = response.utcOffsetSeconds();
+
+			const hourly = response.hourly()!;
+			const current = response.current()!;
+			const daily = response.daily()!;
+
+			// Define Int64 variables so they can be processed accordingly
+			const sunrise = daily.variables(2)!;
+			const sunset = daily.variables(3)!;
+
+			const weatherData = {
+				current: {
+					time: new Date((Number(current.time())) * 1000 ),
+					temperature_2m: current.variables(0)!.value(),
+					precipitation: current.variables(1)!.value(),
+					rain: current.variables(2)!.value(),
+					showers: current.variables(3)!.value(),
+					snowfall: current.variables(4)!.value(),
+					is_day: current.variables(5)!.value(),
+					apparent_temperature: current.variables(6)!.value(),
+					weather_code: current.variables(7)!.value(),
+					cloud_cover: current.variables(8)!.value(),
+
+				},
+				
+				hourly: {
+					time: Array.from(
+						{ length: (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval() },
+						(_, i) => new Date((Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) * 1000)
+					),
+					temperature_2m: hourly.variables(0)!.valuesArray(),
+					showers: hourly.variables(1)!.valuesArray(),
+					snowfall: hourly.variables(2)!.valuesArray(),
+					snow_depth: hourly.variables(3)!.valuesArray(),
+					rain: hourly.variables(4)!.valuesArray(),
+					precipitation: hourly.variables(5)!.valuesArray(),
+					weather_code: hourly.variables(6)!.valuesArray(),
+				},
+				daily: {
+					time: Array.from(
+						{ length: (Number(daily.timeEnd()) - Number(daily.time())) / hourly.interval() },
+						(_, i) => new Date((Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) * 1000)
+					),
+					temperature_2m_max: daily.variables(0)!.valuesArray,
+					temperature_2m_min: daily.variables(1)!.valuesArray,
+
+					// map int64 values
+					sunrise: [...Array(sunrise.valuesInt64Length())].map(
+						(_, i) => new Date((Number(sunrise.valuesInt64(i))))
+					),
+					sunset: [...Array(sunset.valuesInt64Length())].map(
+						(_, i) => new Date((Number(sunset.valuesInt64(i)) + utcOffsetSeconds * 1000))
+					),
+					uv_index_max: daily.variables(4)!.valuesArray(),
+					rain_sum: daily.variables(5)!.valuesArray(),
+					precipitation_probability_max: daily.variables(6)!.valuesArray(),
+					temperature_2m_mean: daily.variables(7)!.valuesArray(),
+					weather_code: daily.variables(8)!.valuesArray(),
+
+				}
+			}
+
+			const localTimeFormatted = weatherData.current.time.toLocaleDateString("en-AU", {
+				timeZone: `${timezone}`,
+				dateStyle: "full",
+				// timeStyle: "medium"
+			})
+		}
+	} catch(error) {
+		console.error("Openmeteo API Error: ", error);
+		return "sorry, I couldn't find any weather data 🥀"
+	}
 }
 
 export async function getCurrentWeather() {
@@ -378,5 +593,5 @@ export async function getCurrentWeather() {
 	} catch (error) {
 		console.error("Openmeteo API Error: ", error);
 		return "sorry, I couldn't find any weather data 🥀"
-	}
-}
+	};
+};

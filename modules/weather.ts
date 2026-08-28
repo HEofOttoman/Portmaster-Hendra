@@ -288,17 +288,24 @@ export interface currentWeather {
 	isDay: boolean;
 	weatherCode: number;
 	clouds: number;
-}
-
+};
 export interface localWeather {
 	name: string;
 	timezone: string;
 	timezoneAbbreviation: string;
 	elevation: number;
 	weatherCurrent: currentWeather;
-}
+};
 
-export async function buildPayload(locations: localWeather[]) {
+// function parseCurrentWeather(): currentWeather {
+// 	// const current = current()!;
+// 	return {
+// 		name, 
+// 		timezone: response.timezone(),
+// 	}
+// }
+
+export function buildPayload(locations: localWeather[]) {
 	return { // taken fromn updateTemplate.json
 	blocks: [
 		{
@@ -311,48 +318,25 @@ export async function buildPayload(locations: localWeather[]) {
 		{	"type": "divider"	},
 		{
 			"type": "carousel",
-			"elements": locations.map((loc, index) => {
+			"elements": locations.map((loc, index) => ({
 				"type": "card",
 				"block_id": `location-card-${index}`,
 				"title": {
 					"type": "mrkdwn",
-					"text": location.name,
+					"text": loc.name,
 				},
 				"subtitle": {
 					"type": "mrkdwn",
-					"text": location.current.time.toLocaleTimeString("en-AU", {
-						timeZone: locations.timezone,
+					"text": loc.weatherCurrent.time.toLocaleTimeString("en-AU", {
+						timeZone: loc.timezone,
 					})
 				}
-			}),
-			/*[
-				{
-					"type": "card",
-					"block_id": "carousel-card-1",
-					"title": {
-						"type": "mrkdwn",
-						"text": "${LOCATION_NAME}",
-						"verbatim": false
-					},
-					"subtitle": {
-						"type": "mrkdwn",
-						"text": "This is a subtitle",
-						"verbatim": false
-					},
-					"body": {
-						"type": "mrkdwn",
-						"text": 
-						"Temperature, Precipitation, Rain, Showers, snowfall, snow depth, weather code",
-						"verbatim": false
-					}
-				}
-			]*/
-		{
-			"type": "divider"
-		},
+			})
+		)},
+		{	"type": "divider"	},
 	],
 	};
-}
+};
 
 export async function fetchData() {
 	// okay cleaning up this architecture
@@ -360,7 +344,6 @@ export async function fetchData() {
 	try {
 		const data = await fetchWeatherApi(url, params);
 
-		let messages = [];
 		for (const response of data) {			
 			const latitude = response.latitude();
 			const longitude = response.longitude();

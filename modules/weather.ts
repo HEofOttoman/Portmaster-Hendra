@@ -297,14 +297,16 @@ export interface localWeather {
 	weatherCurrent: currentWeather;
 };
 
-// function parseCurrentWeather(): currentWeather {
-// 	// const current = current()!;
-// 	return {
-// 		name, 
-// 		timezone: response.timezone(),
-// 	}
-// }
-
+// Helper function to get local time
+export function getLocalTime(locationData: localWeather) {
+	const localTimeFormatted = locationData.weatherCurrent.time.toLocaleDateString("en-AU", {
+		timeZone: `${locationData.timezone}`,
+		dateStyle: "full",
+	})
+	return localTimeFormatted;
+}
+	
+// Makes block kit json payload
 export function buildPayload(locations: localWeather[]) {
 	return { // taken fromn updateTemplate.json
 	blocks: [
@@ -338,11 +340,14 @@ export function buildPayload(locations: localWeather[]) {
 	};
 };
 
+// Parses data
 export async function fetchData() {
 	// okay cleaning up this architecture
 	// This should like get purely the current weather, returning values, which would be parsed by another function?
 	try {
 		const data = await fetchWeatherApi(url, params);
+
+		const dataParsed: localWeather[] = []
 
 		for (const response of data) {			
 			const latitude = response.latitude();
@@ -352,30 +357,36 @@ export async function fetchData() {
 			const timezoneAbbreviation = response.timezoneAbbreviation();
 			const utcOffsetSeconds = response.utcOffsetSeconds();
 
-			const hourly = response.hourly()!;
+			// const hourly = response.hourly()!;
 			const current = response.current()!;
-			const daily = response.daily()!;
+			// const daily = response.daily()!;
 
 			// Define Int64 variables so they can be processed accordingly
-			const sunrise = daily.variables(2)!;
-			const sunset = daily.variables(3)!;
+			// const sunrise = daily.variables(2)!;
+			// const sunset = daily.variables(3)!;
 
-			const weatherData = {
-				current: {
+			const weatherData: localWeather = {
+				name: `${latitude}°N ${longitude}°E`,
+				timezone: timezone ?? "UTC +john",
+				timezoneAbbreviation: timezoneAbbreviation ?? utcOffsetSeconds.toString(),
+				elevation: elevation,
+
+				weatherCurrent: {
 					time: new Date((Number(current.time())) * 1000 ),
-					temperature_2m: current.variables(0)!.value(),
+					// temperature_2m: current.variables(0)!.value(),
+					temperature: current.variables(0)!.value(), // renamed from temp_2m
 					precipitation: current.variables(1)!.value(),
 					rain: current.variables(2)!.value(),
 					showers: current.variables(3)!.value(),
 					snowfall: current.variables(4)!.value(),
-					is_day: current.variables(5)!.value(),
-					apparent_temperature: current.variables(6)!.value(),
-					weather_code: current.variables(7)!.value(),
-					cloud_cover: current.variables(8)!.value(),
+					isDay: Boolean(current.variables(5)!.value()),
+					// apparent_temperature: current.variables(6)!.value(),
+					weatherCode: current.variables(7)!.value(),
+					clouds: current.variables(8)!.value(),
 
 				},
 				
-				hourly: {
+				/*hourly: {
 					time: Array.from(
 						{ length: (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval() },
 						(_, i) => new Date((Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) * 1000)
@@ -409,18 +420,22 @@ export async function fetchData() {
 					temperature_2m_mean: daily.variables(7)!.valuesArray(),
 					weather_code: daily.variables(8)!.valuesArray(),
 
-				}
+				}*/
 			}
 
-			const localTimeFormatted = weatherData.current.time.toLocaleDateString("en-AU", {
+			/*const localTimeFormatted = weatherData.weatherCurrent.time.toLocaleDateString("en-AU", {
 				timeZone: `${timezone}`,
 				dateStyle: "full",
 				// timeStyle: "medium"
-			})
+			})*/
+
+			dataParsed.push(weatherData);
 		}
+
+		return dataParsed;
 	} catch(error) {
 		console.error("Openmeteo API Error: ", error);
-		return "sorry, I couldn't find any weather data 🥀"
+		return "sorry, I couldn't fetch any weather data 🥀"
 	}
 }
 
@@ -432,7 +447,7 @@ export async function getCurrentWeather() {
 	try {
 		const data = await fetchWeatherApi(url, params);
 
-		let messages = [];
+		const messages = [];
 		for (const response of data) {			
 			const latitude = response.latitude();
 			const longitude = response.longitude();

@@ -9,8 +9,9 @@ SDK with Deno, fetching data from the Openmeteo API. I use Deno because why not.
 > >*Warning: This is an unstable API that is subject to change or removal at any time.*
 
 ## Features
+<!-- ![JKT](JKT.png)![NY](NY.png)![Canberra](CBR.png)![NBO](NBO.png) -->
 
-- Fetches weather for hmm important 'port' locations yes
+- Fetches weather for hmm important 'port' locations yes, featuring sketches for banners (cropped questionably by Slack)
 - ~~Reminders~~ Maybe of some sort
 - Daily counter incrementation via regex (very specific). (Should move to Temporal API)
 - Joining & leaving logging via DMing to the owner, welcoming to the channel as well!

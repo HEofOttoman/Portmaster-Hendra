@@ -3,7 +3,7 @@
 import { fetchWeatherApi } from "openmeteo";
 
 const locationStringNames = ["New York City", "Canberra", "Jakarta", "Nairobi"];
-// const locationImages = ["New York City", "Canberra", "Jakarta", "Nairobi"]; // Insert cdn links for future drawings of the cities
+const locationImages = ["https://cdn.hackclub.com/01a04d2e-82b1-760b-9f07-52661777570f/ny.png", "https://cdn.hackclub.com/01a04d2e-77a8-7e7d-808d-e49a1540148d/cbr.png", "https://cdn.hackclub.com/01a04d2e-7b92-78f9-8488-ee51105f4d6e/jkt.png", "https://cdn.hackclub.com/01a04d2e-7ef5-753f-be07-1f3a5c2cd7be/nbo.png"]; // Insert cdn links for future drawings of the cities
 
 const params = {
 	// Coordinates for (in order) New York, Canberra, Jakarta & Nairobi.
@@ -170,7 +170,7 @@ export function buildPayload(locations: localWeather[]) {
 			"type": "carousel",
 			"elements": locations.map((loc, index) => ({
 				"type": "card",
-				// "hero_image": {"type": "image", "image_url": `https://ingo.au/canberra.svg`, "alt_text": "Canberra"},
+				"hero_image": {"type": "image", "image_url": locationImages[index] || `https://user-cdn.hackclub-assets.com/019fd13c-0b7c-7fc5-8e3f-ceb8f7c7d1ab/slack_n_hendra.png`, "alt_text": locationStringNames[index] || loc.name},
 				"block_id": `location-card-${index}`,
 				"title": {
 					"type": "mrkdwn",

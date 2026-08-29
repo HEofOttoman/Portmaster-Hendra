@@ -1,6 +1,7 @@
 // require("dotenv").config();
 
 import { App /*, onlyViewActions*/ } from "@slack/bolt";
+// import type { AnyBlock } from "@slack/types";
 
 import "@std/dotenv/load";
 import process from "node:process"; // <- Added because NodeJS process global is discouraged in Deno
@@ -34,19 +35,15 @@ const app = new App({
 app.event("app_home_opened", async ({ event, client, logger }) => {
   try {
     // await homeview;
-    
+    const locationsData = await fetchWeatherData();
+    const weatherPayload = await buildPayload(locationsData ?? []);
+
+    // const weatherCards = weatherPayload.blocks.find((block) => block.type === "carousel")
+    const weatherCards = weatherPayload.blocks;
+
     await client.views.publish({
       user_id: event.user,
-      view:  //{ // inject app_home.json here
-        // type: "home",
-        // blocks: [
-        //   {
-        //     type: "header",
-        //     text: { type: "plain_text", text: "This is app home."}
-            
-        //   }
-        // ],
-      //}
+      view:
       {
       "type": "home",
       "blocks": [
@@ -81,7 +78,9 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
         {
           "type": "divider"
         }, // insert weather info here
-        {
+        // (( weatherCards ? [weatherCards] : []) as any),
+        ...weatherCards, // wow spread operator i didnt know that exists
+        /*{
           "type": "carousel",
           "elements": [
             {
@@ -109,7 +108,7 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
               }
             }
           ]
-        },
+        },*/
         {
           "type": "divider"
         },
@@ -235,14 +234,7 @@ app.command("/weather-ports", async ({ /*command,*/ ack, respond }) => {
   await respond({
     text: `Weather of the ports:`,
     blocks: msg.blocks
-    /*blocks: [
-      {
-        "subtitle": {
-          "type": "mrkdwn",
-          "text": `Requested by you, <@${command.user_id}>`
-        }
-      }
-    ],*/
+    
   });
 });
 

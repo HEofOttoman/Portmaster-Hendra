@@ -2,7 +2,8 @@
 
 import { fetchWeatherApi } from "openmeteo";
 
-// const locationStringNames = ["New York City", "Canberra", "Jakarta", "Nairobi"];
+const locationStringNames = ["New York City", "Canberra", "Jakarta", "Nairobi"];
+// const locationImages = ["New York City", "Canberra", "Jakarta", "Nairobi"]; // Insert cdn links for future drawings of the cities
 
 const params = {
 	// Coordinates for (in order) New York, Canberra, Jakarta & Nairobi.
@@ -17,11 +18,11 @@ const params = {
 	timeformat: "unixtime",
 };
 const url = "https://api.open-meteo.com/v1/forecast";
-const responses = await fetchWeatherApi(url, params);
+// const responses = await fetchWeatherApi(url, params);
 
 
 // Process 4 locations
-for (const response of responses) {
+/*for (const response of responses) {
 	// Attributes for timezone and location
 	const latitude = response.latitude();
 	const longitude = response.longitude();
@@ -123,7 +124,7 @@ for (const response of responses) {
 	);
 	// console.log("\nHourly data:\n", weatherData.hourly)
 	// console.log("\Daily data:\n", weatherData.daily)
-}
+}*/
 
 export interface currentWeather {
 	time: Date;
@@ -169,16 +170,22 @@ export function buildPayload(locations: localWeather[]) {
 			"type": "carousel",
 			"elements": locations.map((loc, index) => ({
 				"type": "card",
+				// "hero_image": {"type": "image", "image_url": `https://ingo.au/canberra.svg`, "alt_text": "Canberra"},
 				"block_id": `location-card-${index}`,
 				"title": {
 					"type": "mrkdwn",
-					"text": loc.name,
+					// "text": loc.name,
+					"text": locationStringNames[index] || loc.name,
 				},
 				"subtitle": {
 					"type": "mrkdwn",
 					"text": loc.weatherCurrent.time.toLocaleTimeString("en-AU", {
 						timeZone: loc.timezone,
 					})
+				},
+				"body": {
+					"type": "mrkdwn",
+					"text": `_${loc.name}_\n*Temperature*: ${loc.weatherCurrent.temperature}°C\n*Precipitation*: ${loc.weatherCurrent.precipitation}mm,\n*Rain*: ${loc.weatherCurrent.rain}%,\n*Showers*: ${loc.weatherCurrent.showers},\n*Snowfall*: ${loc.weatherCurrent.snowfall},\n*Daytime?*: ${loc.weatherCurrent.isDay},\n*Weather Code*: ${loc.weatherCurrent.weatherCode},\n*Clouds*: ${loc.weatherCurrent.clouds},\n`
 				}
 			})
 		)},

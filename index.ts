@@ -1,5 +1,3 @@
-// require("dotenv").config();
-
 import { App /*, onlyViewActions*/ } from "@slack/bolt";
 // import type { AnyBlock } from "@slack/types";
 
@@ -43,18 +41,18 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
 
     await client.views.publish({
       user_id: event.user,
-      view:
-      {
+      view:{
       "type": "home",
       "blocks": [
         {
+          // "type": "markdown",
+          // "text": "# Hendra"
           "type": "header",
           "text": {
             "type": "plain_text",
             "text": "Hendra",
             "emoji": true
           },
-          // "level": 1
         },
         {
           "type": "image",
@@ -75,43 +73,9 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
           },
           // "level": 2
         },
-        {
-          "type": "divider"
-        }, // insert weather info here
-        // (( weatherCards ? [weatherCards] : []) as any),
+        {"type": "divider"}, // insert weather info here
         ...weatherCards, // wow spread operator i didnt know that exists
-        /*{
-          "type": "carousel",
-          "elements": [
-            {
-              "type": "card",
-              "block_id": "carousel-card-4",
-              "icon": {
-                "type": "image",
-                "image_url": "https://picsum.photos/36/36",
-                "alt_text": "Icon"
-              },
-              "title": {
-                "type": "mrkdwn",
-                "text": "New York",
-                "verbatim": false
-              },
-              "subtitle": {
-                "type": "mrkdwn",
-                "text": "`${CurrentTime}`",
-                "verbatim": false
-              },
-              "body": {
-                "type": "mrkdwn",
-                "text": "Current Temperature: ${currentTemp} \n Precipation: ${precipitation} \n ☀️/🌃",
-                "verbatim": false
-              }
-            }
-          ]
-        },*/
-        {
-          "type": "divider"
-        },
+        // {"type": "divider"}, Divider here exists from carousel alr and looks ugly ahh so comment out
         {
           "type": "section",
           "text": {
@@ -128,12 +92,10 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
             },
             "value": "join_btn",
             "action_id": "join-t1"
-            
           }
         }
       ]
     }
-
     });
 
   } catch (error) {

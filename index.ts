@@ -189,15 +189,18 @@ app.command("/hendra-ping", async ({ /*command,*/ ack, respond }) => {
 
 app.command("/weather-ports", async ({ /*command,*/ ack, respond }) => {
   await ack();
+  try {
+    const locationsData = await fetchWeatherData();
+    const msg = buildPayload(locationsData ?? []);
 
-  const locationsData = await fetchWeatherData();
-  const msg = buildPayload(locationsData ?? []);
-
-  await respond({
-    text: `Weather of the ports:`,
-    blocks: msg.blocks
-    
-  });
+    await respond({
+        text: `Weather of the ports:`,
+        blocks: msg.blocks
+        
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.command("/hendra-help", async ({ command, ack, respond }) => {
@@ -306,24 +309,6 @@ app.event("member_joined_channel", async ({ event, /*say,*/ client, logger }) =>
         }
       ]
     });
-    /* "accessory": {
-            "type": "button",
-            "style": "primary",
-            "text": {
-              "type": "plain_text",
-              "text": "Sail.",
-              "emoji": true
-            },
-            "value": "join_btn",
-            "action_id": "button-action"
-          }*/
-
-    // await client.chat.postMessage({
-    //   channel: event.channel,
-    //   text:
-    //     `<@${event.user}> :wavey: Welcome to Henry's channel! <@${`U080F22CTJN`}>, greet your guest. Behave, or I might have to █████ ███ ██████ :>.`,
-    // });
-    // Not needed as long as private channels show you joined
   } catch (error) {
     logger.error("Error handling event:", error);
     console.log(error);
